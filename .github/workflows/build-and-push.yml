@@ -1,0 +1,38 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go environment
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.23.1'
+
+      - name: Log in to Docker Hub
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: echo "${PASSWORD}" | docker login --username "${USERNAME}" --password-stdin
+
+      - name: Build and push Docker image
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+        run: |
+          docker build --no-cache -t ${USERNAME}/${IMAGE_NAME}:latest .
+          docker push ${USERNAME}/${IMAGE_NAME}:latest
+
+      - name: Run Docker container (optional)
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+        run: |
+          docker run -d -p 50050:50050 ${USERNAME}/${IMAGE_NAME}:latest
