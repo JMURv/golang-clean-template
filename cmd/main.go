@@ -16,7 +16,7 @@ import (
 	"syscall"
 )
 
-const configPath = "local.config.yaml"
+const configPath = "configs/local.config.yaml"
 
 func mustRegisterLogger(mode string) {
 	switch mode {
@@ -41,17 +41,14 @@ func main() {
 	conf := config.MustLoad(configPath)
 	mustRegisterLogger(conf.Server.Mode)
 
-	// Start metrics and tracing
 	go prometheus.New(conf.Server.Port + 5).Start(ctx)
 	go jaeger.Start(ctx, conf.ServiceName, conf.Jaeger)
 
-	// Setting up main app
 	cache := redis.New(conf.Redis)
 	repo := db.New(conf.DB)
 	svc := ctrl.New(repo, cache)
 	h := grpc.New(conf.ServiceName, svc)
 
-	// Start service
 	zap.L().Info(
 		fmt.Sprintf(
 			"Starting server on %v://%v:%v",
