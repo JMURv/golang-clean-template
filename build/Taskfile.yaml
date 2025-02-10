@@ -1,0 +1,43 @@
+version: 3
+
+tasks:
+  dc-dev:
+    desc: Run dev compose
+    cmds:
+      - "docker compose -f compose/dc.dev.yaml up"
+
+  dc-dev-build:
+    desc: Build dev compose
+    cmds:
+      - "docker compose -f compose/dc.dev.yaml build"
+
+  dc-dev-down:
+    desc: Shutdown dev compose
+    cmds:
+      - "docker compose -f compose/dc.dev.yaml down"
+
+  dc-prod:
+    desc: Run prod compose
+    cmds:
+      - "docker compose -f compose/dc.prod.yaml up"
+
+  dc-prod-down:
+    desc: Shutdown prod compose
+    cmds:
+      - "docker compose -f compose/dc.prod.yaml down"
+
+  k-up:
+    desc: Run k8s manifests
+    cmds:
+      - "kubectl apply -f k8s/cfg/cfg.yaml"
+      - "kubectl apply -f k8s/cfg/secret.yaml"
+      - "kubectl apply -f k8s/cfg/svc.yaml"
+      - "kubectl apply -f k8s/cfg/deploy.yaml"
+
+  k-down:
+    desc: Remove k8s manifests
+    cmds:
+      - "kubectl delete -f k8s/cfg/cfg.yaml"
+      - "kubectl delete -f k8s/cfg/secret.yaml"
+      - "kubectl delete -f k8s/cfg/svc.yaml"
+      - "kubectl delete -f k8s/cfg/deploy.yaml"

@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: app
+  labels:
+    app: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: app
+          image: image
+
+          envFrom:
+            - configMapRef:
+                name: app-cfg
+            - secretRef:
+                name: app-secret
+
+          ports:
+            - name: srv
+              containerPort: 8080
+
+          livenessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            httpGet:
+              path: /health
+              port: 8080
+
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            httpGet:
+              path: /health
+              port: 8080
+
+          volumeMounts:
+            - name: app-config
+              mountPath: /app/configs/local.config.yaml
+              subPath: local.config.yaml
+
+      volumes:
+        - name: app-config
+          configMap:
+            name: app-cfg
+            items:
+              - key: config.yaml
+                path: local.config.yaml

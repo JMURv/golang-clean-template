@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-cfg
+data:
+  POSTGRES_HOST: "app-svc"
+  POSTGRES_PORT: "5432"
+  PGDATA: "/var/lib/postgresql/data"
+
+  config.yaml: |
+    serviceName: "svc-name"
+
+    server:
+      mode: "dev"
+      port: 8080
+      scheme: "http"
+      domain: "localhost"
+
+    db:
+      host: "localhost"
+      port: 5432
+      user: "app_owner"
+      password: "app_password"
+      database: "app_db"
+
+    redis:
+      addr: "localhost:6379"
+      pass: ""
+
+    jaeger:
+      sampler:
+        type: "const"
+        param: 1
+      reporter:
+        LogSpans: true
+        LocalAgentHostPort: "localhost:6831"

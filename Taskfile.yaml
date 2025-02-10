@@ -9,13 +9,12 @@ tasks:
   pb:
     desc: Gen Proto file
     cmds:
-      - "protoc --go_out=. --go-grpc_out=. --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative api/pb/products.proto"
+      - "protoc --go_out=. --go-grpc_out=. --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative api/grpc/gen/app.proto"
 
   mocks:
     desc: Generate mocks
     cmds:
-      - mockgen -source="./internal/hdl/interfaces.go" -destination="mocks/mock_ctrl.go" -package=mocks
-      - mockgen -source="./internal/ctrl/ctrl.go" -destination="mocks/mock_repos.go" -package=mocks
+      - mockgen -source="./internal/ctrl/ctrl.go" -destination="tests/mocks/mock_repos.go" -package=mocks
 
   t:
     desc: Run tests
@@ -27,18 +26,15 @@ tasks:
   t-hdl:
     desc: Test handlers
     cmds:
-      - "go test ./internal/hdl/http"
-      - "go test -coverprofile=cov_http.out ./internal/hdl/http && go tool cover -func=cov_http.out"
-      - "go test -coverprofile=cov_http.out ./internal/hdl/http && go tool cover -html=cov_http.out"
-      - "go test ./internal/hdl/grpc"
-      - "go test -coverprofile=cov_grpc.out ./internal/hdl/grpc && go tool cover -func=cov_grpc.out"
-      - "go test -coverprofile=cov_grpc.out ./internal/hdl/grpc && go tool cover -html=cov_grpc.out"
+      - "task t-http"
+      - "task t-grpc"
 
   t-http:
     desc: Test http handlers
     cmds:
       - "go test ./internal/hdl/http"
       - "go test -coverprofile=cov_http.out ./internal/hdl/http && go tool cover -func=cov_http.out"
+      - "go test -coverprofile=cov_http.out ./internal/hdl/http && go tool cover -html=cov_http.out"
 
   t-grpc:
     desc: Test grpc handlers
@@ -46,11 +42,6 @@ tasks:
       - "go test ./internal/hdl/grpc"
       - "go test -coverprofile=cov_grpc.out ./internal/hdl/grpc && go tool cover -func=cov_grpc.out"
       - "go test -coverprofile=cov_grpc.out ./internal/hdl/grpc && go tool cover -html=cov_grpc.out"
-
-  t-mid:
-    desc: Test middlewares
-    cmds:
-      - "go test ./internal/hdl/http/middleware"
 
   t-ctrl:
     desc: Run ctrl tests

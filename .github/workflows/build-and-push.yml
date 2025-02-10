@@ -35,4 +35,4 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
         run: |
-          docker run -d -p 50050:50050 ${USERNAME}/${IMAGE_NAME}:latest
+          docker run -d -p 8080:8080 ${USERNAME}/${IMAGE_NAME}:latest

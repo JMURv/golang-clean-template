@@ -1,3 +1,11 @@
 *~
 *.out
 .idea
+
+.env*
+!.env.example
+
+*config.yml
+*config.yaml
+!example.config.yml
+!example.config.yaml
