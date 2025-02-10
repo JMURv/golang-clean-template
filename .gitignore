@@ -9,3 +9,6 @@
 *config.yaml
 !example.config.yml
 !example.config.yaml
+
+bin/*
+!bin/.gitkeep

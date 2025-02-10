@@ -29,10 +29,3 @@ jobs:
         run: |
           docker build --no-cache -t ${USERNAME}/${IMAGE_NAME}:latest .
           docker push ${USERNAME}/${IMAGE_NAME}:latest
-
-      - name: Run Docker container (optional)
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-        run: |
-          docker run -d -p 8080:8080 ${USERNAME}/${IMAGE_NAME}:latest

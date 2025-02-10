@@ -1,10 +1,20 @@
 version: 3
 
+vars:
+  OS: go env GOOS
+  ARCH: go env GOARCH
+  BIN_DIR: "bin/{{.OS}}-{{.ARCH}}"
+
 tasks:
   app:
     desc: Run app
     cmds:
       - "go run cmd/main.go"
+
+  build:
+    desc: Build app
+    cmds:
+      - go build -o bin/main ./cmd/main.go
 
   pb:
     desc: Gen Proto file

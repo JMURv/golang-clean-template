@@ -34,9 +34,9 @@ services:
     volumes:
       - ../../configs/dev.config.yaml:/app/configs/local.config.yaml
     ports:
-      - "8080:8080"
+      - "${APP_PORT}:${APP_PORT}"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:${APP_PORT}/health" ]
       interval: 5s
       timeout: 5s
       retries: 3
