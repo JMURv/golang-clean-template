@@ -29,7 +29,6 @@ jaeger:
     LogSpans: true
     LocalAgentHostPort: "localhost:6831"
 ```
-___
 
 ## Build
 ### Locally
@@ -38,6 +37,8 @@ In root folder run:
 go build -o bin/main ./cmd/main.go
 ```
 After that, you can run app via `./bin/main`
+
+___
 
 ### Docker
 Head to the `build` folder via:
@@ -55,8 +56,6 @@ But if you need to build it manually run:
 task dc-dev-build
 ```
 
-___
-
 ## Run
 ### Locally
 ```shell
@@ -67,6 +66,8 @@ Or if you previously build the app, run it via:
 ```shell
 go run bin/main
 ```
+
+___
 
 ### Docker-Compose
 Head to the `build` folder via:
