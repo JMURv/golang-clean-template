@@ -11,6 +11,11 @@ tasks:
     cmds:
       - "go run cmd/main.go"
 
+  lint:
+    desc: Lint app
+    cmds:
+      - "golangci-lint run"
+
   build:
     desc: Build app
     cmds:

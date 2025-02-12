@@ -24,6 +24,7 @@ func New(ctrl ctrl.AppCtrl) *Handler {
 
 func (h *Handler) Start(port int) {
 	mux := http.NewServeMux()
+	RegisterRoutes(mux, h)
 	mux.HandleFunc(
 		"/health", func(w http.ResponseWriter, r *http.Request) {
 			utils.SuccessResponse(w, http.StatusOK, "OK")

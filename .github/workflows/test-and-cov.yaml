@@ -1,0 +1,52 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go environment
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.23.1'
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Install gocovmerge
+        run: go install github.com/wadey/gocovmerge@latest
+
+      - name: Run repository tests
+        run: go test -coverprofile=cov_repo.out ./internal/repo/db
+
+      - name: Run controller tests
+        run: go test -coverprofile=cov_ctrl.out ./internal/ctrl
+
+      - name: Run HTTP handler tests
+        run: go test -coverprofile=cov_http.out ./internal/hdl/http
+
+      - name: Run gRPC handler tests
+        run: go test -coverprofile=cov_grpc.out ./internal/hdl/grpc
+
+      - name: Merge coverage reports
+        run: gocovmerge cov_repo.out cov_ctrl.out cov_http.out cov_grpc.out > coverage.out
+
+      - name: Update coverage report
+        uses: ncruces/go-coverage-report@v0
+        with:
+          coverage-file: coverage.out
+          report: true
+          chart: true
+          amend: true
+        if: |
+          matrix.os == 'ubuntu-latest' &&
+          github.event_name == 'push'
+        continue-on-error: true

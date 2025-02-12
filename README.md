@@ -12,7 +12,7 @@ Example file looks like that:
 ```yaml
 serviceName: "svc-name"
 
-server:
+server: 
   mode: "dev" # dev, prod
   port: 8080
   scheme: "http"
