@@ -16,6 +16,7 @@ WORKDIR /app
 
 COPY ./internal/repo/db/migration /app/internal/repo/db/migration
 COPY --from=builder /app/main ./
+COPY --from=builder /app/go.mod ./go.mod
 
 EXPOSE 8080
 

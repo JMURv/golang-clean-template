@@ -8,13 +8,7 @@ tasks:
   dc-dev:
     desc: Run dev compose
     cmds:
-      - "docker compose --env-file {{.DEV_ENV_FILE}} -f compose/dc.dev.yaml build"
-      - "docker compose --env-file {{.DEV_ENV_FILE}} -f compose/dc.dev.yaml up"
-
-  dc-dev-build:
-    desc: Build dev compose
-    cmds:
-      - "docker compose --env-file {{.DEV_ENV_FILE}} -f compose/dc.dev.yaml build"
+      - "docker compose --env-file {{.DEV_ENV_FILE}} -f compose/dc.dev.yaml up --build"
 
   dc-dev-down:
     desc: Shutdown dev compose
@@ -30,6 +24,16 @@ tasks:
     desc: Shutdown prod compose
     cmds:
       - "docker compose -f compose/dc.prod.yaml down"
+
+  dc-observe:
+    desc: Run metrics compose
+    cmds:
+      - "docker compose -f compose/dc.observe.yaml up"
+
+  dc-observe-down:
+    desc: Shutdown metrics compose
+    cmds:
+      - "docker compose -f compose/dc.observe.yaml down"
 
   k-up:
     desc: Run k8s manifests

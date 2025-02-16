@@ -1,0 +1,28 @@
+serviceName: "svc-name"
+secret: "DYHlaJpPiZ"
+
+server:
+  mode: "dev"
+  port: 8080
+  scheme: "http"
+  domain: "localhost"
+
+db:
+  host: "localhost"
+  port: 5432
+  user: "app_owner"
+  password: "app_password"
+  database: "app_db_test"
+
+redis:
+  addr: "localhost:6379"
+  pass: ""
+
+jaeger:
+  sampler:
+    type: "const"
+    param: 1
+  reporter:
+    LogSpans: true
+    LocalAgentHostPort: "localhost:6831"
+    CollectorEndpoint: "http://localhost:14268/api/traces"

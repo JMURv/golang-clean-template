@@ -11,9 +11,10 @@ Example file looks like that:
 
 ```yaml
 serviceName: "svc-name"
+secret: "DYHlaJpPiZ"
 
-server: 
-  mode: "dev" # dev, prod
+server:
+  mode: "dev"
   port: 8080
   scheme: "http"
   domain: "localhost"
@@ -36,6 +37,7 @@ jaeger:
   reporter:
     LogSpans: true
     LocalAgentHostPort: "localhost:6831"
+    CollectorEndpoint: "http://localhost:14268/api/traces"
 ```
 
 - Create your own `local.config.yaml` based on `example.config.yaml`
@@ -44,13 +46,11 @@ jaeger:
 
 ### ENV
 Docker compose files using `.env.dev` and `.env.prod` files located at `build/compose/env/` folder, so you need to create them
-- Specify `DEV_ENV_FILE` and `PROD_ENV_FILE` vars in `build/Taskfile.yaml`
 
 ## Build
-
 ### Locally
 
-In root folder run:
+In root folder run (uses `local.config.yaml`):
 
 ```shell
 go build -o bin/main ./cmd/main.go
@@ -74,24 +74,11 @@ After that, you can just start docker compose file that will build image automat
 task dc-dev
 ```
 
-But if you need to build it manually run:
-
-```shell
-task dc-dev-build
-```
-
 ## Run
-
 ### Locally
 
 ```shell
 go run cmd/main.go
-```
-
-Or if you previously build the app, run it via:
-
-```shell
-go run bin/main
 ```
 
 ___
@@ -116,6 +103,20 @@ Run prod:
 task dc-prod
 ```
 
+Also there is ability to up svcs like: `prometheus`, `jaeger`, `node-exporter`, `grafana`:
+```shell
+task dc-observe
+```
+Services are available at:
+
+| Сервис     | Адрес                  |
+|------------|------------------------|
+| App        | http://localhost:8080  |
+| Prometheus | http://localhost:9090  |
+| Jaeger     | http://localhost:16686 |
+| Grafana    | http://localhost:3000  |
+
+
 ___
 
 ### K8s
@@ -131,3 +132,16 @@ Shutdown manifests
 ```shell
 task k-down
 ```
+
+## Tests
+Spin up testing DB for `E2E` tests:
+```shell
+docker run -d --name pg-container \
+  -e POSTGRES_USER=app_owner \
+  -e POSTGRES_PASSWORD=app_password \
+  -e POSTGRES_DB=app_db_test \
+  -p 5432:5432 \
+  -v pgdata:/var/lib/postgresql/data \
+  postgres:15.0-alpine
+```
+After that, run `task t-integ`

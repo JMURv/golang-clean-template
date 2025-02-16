@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/cache/redis"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
-	"github.com/JMURv/golang-clean-template/internal/hdl/grpc"
+	"github.com/JMURv/golang-clean-template/internal/hdl/http"
 	"github.com/JMURv/golang-clean-template/internal/observability/metrics/prometheus"
 	"github.com/JMURv/golang-clean-template/internal/observability/tracing/jaeger"
 	"github.com/JMURv/golang-clean-template/internal/repo/db"
@@ -44,10 +45,11 @@ func main() {
 	go prometheus.New(conf.Server.Port + 5).Start(ctx)
 	go jaeger.Start(ctx, conf.ServiceName, conf.Jaeger)
 
+	auth.New(conf.Secret)
 	cache := redis.New(conf.Redis)
 	repo := db.New(conf.DB)
 	svc := ctrl.New(repo, cache)
-	h := grpc.New(conf.ServiceName, svc)
+	h := http.New(svc)
 
 	zap.L().Info(
 		fmt.Sprintf(
@@ -64,7 +66,7 @@ func main() {
 	<-c
 
 	zap.L().Info("Shutting down gracefully...")
-	if err := h.Close(); err != nil {
+	if err := h.Close(ctx); err != nil {
 		zap.L().Warn("Error closing handler", zap.Error(err))
 	}
 

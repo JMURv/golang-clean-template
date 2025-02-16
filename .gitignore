@@ -1,14 +1,17 @@
 *~
 *.out
 .idea
+!.gitkeep
 
 .env*
 !.env.example
+!.env.test
 
 *config.yml
 *config.yaml
 !example.config.yml
 !example.config.yaml
+!test.config.yml
+!test.config.yaml
 
 bin/*
-!bin/.gitkeep

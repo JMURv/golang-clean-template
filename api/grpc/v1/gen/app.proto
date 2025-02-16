@@ -1,0 +1,9 @@
+syntax = "proto3";
+package gen;
+option go_package = "github.com/JMURv/go-clean-template/api/grpc/v1/gen";
+
+message Empty {}
+
+service App {
+  rpc Procedure(Empty) returns (Empty);
+}

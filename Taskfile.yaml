@@ -6,25 +6,25 @@ vars:
   BIN_DIR: "bin/{{.OS}}-{{.ARCH}}"
 
 tasks:
-  app:
+  run:
     desc: Run app
     cmds:
       - "go run cmd/main.go"
-
-  lint:
-    desc: Lint app
-    cmds:
-      - "golangci-lint run"
 
   build:
     desc: Build app
     cmds:
       - go build -o bin/main ./cmd/main.go
 
+  lint:
+    desc: Lint app
+    cmds:
+      - "golangci-lint run"
+
   pb:
     desc: Gen Proto file
     cmds:
-      - "protoc --go_out=. --go-grpc_out=. --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative api/grpc/v1/app.proto"
+      - "protoc --go_out=. --go-grpc_out=. --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative api/grpc/v1/gen/app.proto"
 
   mocks:
     desc: Generate mocks
@@ -37,6 +37,7 @@ tasks:
       - "task t-hdl"
       - "task t-ctrl"
       - "task t-repo"
+      - "task t-integ"
 
   t-hdl:
     desc: Test handlers
@@ -49,25 +50,26 @@ tasks:
     cmds:
       - "go test ./internal/hdl/http"
       - "go test -coverprofile=cov_http.out ./internal/hdl/http && go tool cover -func=cov_http.out"
-      - "go test -coverprofile=cov_http.out ./internal/hdl/http && go tool cover -html=cov_http.out"
 
   t-grpc:
     desc: Test grpc handlers
     cmds:
       - "go test ./internal/hdl/grpc"
       - "go test -coverprofile=cov_grpc.out ./internal/hdl/grpc && go tool cover -func=cov_grpc.out"
-      - "go test -coverprofile=cov_grpc.out ./internal/hdl/grpc && go tool cover -html=cov_grpc.out"
 
   t-ctrl:
     desc: Run ctrl tests
     cmds:
       - "go test ./internal/ctrl"
       - "go test -coverprofile=cov_ctrl.out ./internal/ctrl && go tool cover -func=cov_ctrl.out"
-      - "go test -coverprofile=cov_ctrl.out ./internal/ctrl && go tool cover -html=cov_ctrl.out"
 
   t-repo:
     desc: Run repo tests
     cmds:
       - "go test ./internal/repo/db"
       - "go test -coverprofile=cov_repo.out ./internal/repo/db && go tool cover -func=cov_repo.out"
-      - "go test -coverprofile=cov_repo.out ./internal/repo/db && go tool cover -html=cov_repo.out"
+
+  t-integ:
+    desc: Run integration tests
+    cmds:
+      - "go test ./tests/"

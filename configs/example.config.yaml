@@ -1,4 +1,5 @@
 serviceName: "svc-name"
+secret: "DYHlaJpPiZ"
 
 server:
   mode: "dev"
@@ -24,3 +25,4 @@ jaeger:
   reporter:
     LogSpans: true
     LocalAgentHostPort: "localhost:6831"
+    CollectorEndpoint: "http://localhost:14268/api/traces"

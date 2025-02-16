@@ -8,7 +8,13 @@ spec:
   selector:
     app: app
   ports:
-    - protocol: TCP
+    - name: http
       port: 8080
       targetPort: 8080
-  type: ClusterIP
+      nodePort: 30080
+
+    - name: metrics
+      port: 8085
+      targetPort: 8085
+      nodePort: 30085
+  type: NodePort

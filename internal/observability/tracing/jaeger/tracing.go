@@ -18,9 +18,9 @@ func Start(ctx context.Context, serviceName string, conf *cfg.JaegerConfig) {
 		Reporter: &jaegercfg.ReporterConfig{
 			LogSpans:           conf.Reporter.LogSpans,
 			LocalAgentHostPort: conf.Reporter.LocalAgentHostPort,
+			CollectorEndpoint:  conf.Reporter.CollectorEndpoint,
 		},
 	}
-
 	tracer, closer, err := tracerCfg.NewTracer()
 	if err != nil {
 		zap.L().Fatal("Error initializing Jaeger tracer", zap.Error(err))

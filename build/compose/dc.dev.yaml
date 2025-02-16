@@ -5,6 +5,7 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+    networks: [app]
 
   db:
     container_name: db
@@ -21,11 +22,12 @@ services:
     healthcheck:
       test: 'psql -w -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost -c "SELECT 1"'
       interval: 5s
-      timeout: 30s
-      retries: 3
-      start_period: 15s
+      timeout: 2s
+      retries: 5
+      start_period: 5s
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks: [app]
 
   app:
     container_name: app
@@ -37,6 +39,7 @@ services:
       - ../../configs/dev.config.yaml:/app/configs/local.config.yaml
     ports:
       - "${APP_PORT}:${APP_PORT}"
+      - "${APP_METRICS_PORT}:${APP_METRICS_PORT}"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:${APP_PORT}/health" ]
       interval: 5s
@@ -48,6 +51,11 @@ services:
         restart: true
       redis:
         condition: service_started
+    networks: [app]
 
 volumes:
   pgdata:
+
+networks:
+  app:
+    name: app

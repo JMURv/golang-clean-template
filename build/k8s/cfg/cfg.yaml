@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: app-cfg
 data:
-  POSTGRES_HOST: "app-svc"
+  POSTGRES_HOST: "localhost"
   POSTGRES_PORT: "5432"
   PGDATA: "/var/lib/postgresql/data"
 

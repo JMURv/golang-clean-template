@@ -24,6 +24,7 @@ func New(ctrl ctrl.AppCtrl) *Handler {
 
 func (h *Handler) Start(port int) {
 	mux := http.NewServeMux()
+
 	RegisterRoutes(mux, h)
 	mux.HandleFunc(
 		"/health", func(w http.ResponseWriter, r *http.Request) {
@@ -31,8 +32,8 @@ func (h *Handler) Start(port int) {
 		},
 	)
 
-	handler := mid.RecoverPanic(mux)
-	handler = mid.TracingMiddleware(mux)
+	handler := mid.Logging(mux)
+	handler = mid.RecoverPanic(handler)
 	h.srv = &http.Server{
 		Handler:      handler,
 		Addr:         fmt.Sprintf(":%v", port),
