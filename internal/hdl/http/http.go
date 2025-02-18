@@ -42,6 +42,10 @@ func (h *Handler) Start(port int) {
 		IdleTimeout:  60 * time.Second,
 	}
 
+	zap.L().Info(
+		"Starting HTTP server",
+		zap.String("addr", h.srv.Addr),
+	)
 	err := h.srv.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		zap.L().Debug("Server error", zap.Error(err))

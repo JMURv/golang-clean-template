@@ -1,8 +1,8 @@
+mode: "dev"
 serviceName: "svc-name"
 secret: "DYHlaJpPiZ"
 
 server:
-  mode: "dev"
   port: 8080
   scheme: "http"
   domain: "localhost"

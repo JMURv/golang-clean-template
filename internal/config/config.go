@@ -6,6 +6,7 @@ import (
 )
 
 type Config struct {
+	Mode        string        `yaml:"mode" env-default:"dev"`
 	ServiceName string        `yaml:"serviceName" env-required:"true"`
 	Secret      string        `yaml:"secret" env-required:"true"`
 	Server      *ServerConfig `yaml:"server"`
@@ -15,7 +16,6 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Mode   string `yaml:"mode" env-default:"dev"`
 	Port   int    `yaml:"port" env-required:"true"`
 	Scheme string `yaml:"scheme" env-default:"http"`
 	Domain string `yaml:"domain" env-default:"localhost"`
@@ -36,8 +36,8 @@ type RedisConfig struct {
 
 type JaegerConfig struct {
 	Sampler struct {
-		Type  string `yaml:"type"`
-		Param int    `yaml:"param"`
+		Type  string  `yaml:"type"`
+		Param float64 `yaml:"param"`
 	} `yaml:"sampler"`
 	Reporter struct {
 		LogSpans           bool   `yaml:"LogSpans"`

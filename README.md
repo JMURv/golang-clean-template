@@ -116,7 +116,6 @@ Services are available at:
 | Jaeger     | http://localhost:16686 |
 | Grafana    | http://localhost:3000  |
 
-
 ___
 
 ### K8s

@@ -13,8 +13,8 @@ type AppCtrl interface{}
 type CacheService interface {
 	io.Closer
 	GetToStruct(ctx context.Context, key string, dest any) error
-	Set(ctx context.Context, t time.Duration, key string, val any) error
-	Delete(ctx context.Context, key string) error
+	Set(ctx context.Context, t time.Duration, key string, val any)
+	Delete(ctx context.Context, key string)
 	InvalidateKeysByPattern(ctx context.Context, pattern string)
 }
 

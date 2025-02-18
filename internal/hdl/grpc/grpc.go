@@ -62,6 +62,10 @@ func (h *Handler) Start(port int) {
 		zap.L().Fatal("failed to listen", zap.Error(err))
 	}
 
+	zap.L().Info(
+		"Starting GRPC server",
+		zap.String("addr", lis.Addr().String()),
+	)
 	if err = h.srv.Serve(lis); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 		zap.L().Fatal("failed to serve", zap.Error(err))
 	}

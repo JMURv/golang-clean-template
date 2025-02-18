@@ -2,32 +2,36 @@ package jaeger
 
 import (
 	"context"
-	cfg "github.com/JMURv/golang-clean-template/internal/config"
-	"github.com/opentracing/opentracing-go"
-	jaegercfg "github.com/uber/jaeger-client-go/config"
+	"github.com/JMURv/golang-clean-template/internal/config"
+	ot "github.com/opentracing/opentracing-go"
+	jaeger "github.com/uber/jaeger-client-go/config"
 	"go.uber.org/zap"
 )
 
-func Start(ctx context.Context, serviceName string, conf *cfg.JaegerConfig) {
-	tracerCfg := jaegercfg.Configuration{
+func Start(ctx context.Context, serviceName string, conf *config.JaegerConfig) {
+	cfg := jaeger.Configuration{
 		ServiceName: serviceName,
-		Sampler: &jaegercfg.SamplerConfig{
+		Sampler: &jaeger.SamplerConfig{
 			Type:  conf.Sampler.Type,
-			Param: float64(conf.Sampler.Param),
+			Param: conf.Sampler.Param,
 		},
-		Reporter: &jaegercfg.ReporterConfig{
+		Reporter: &jaeger.ReporterConfig{
 			LogSpans:           conf.Reporter.LogSpans,
 			LocalAgentHostPort: conf.Reporter.LocalAgentHostPort,
 			CollectorEndpoint:  conf.Reporter.CollectorEndpoint,
 		},
 	}
-	tracer, closer, err := tracerCfg.NewTracer()
+	tracer, closer, err := cfg.NewTracer()
 	if err != nil {
-		zap.L().Fatal("Error initializing Jaeger tracer", zap.Error(err))
+		zap.L().Fatal("Error initializing Jaeger", zap.Error(err))
 	}
 
-	opentracing.SetGlobalTracer(tracer)
-	zap.L().Info("Jaeger has been started")
+	ot.SetGlobalTracer(tracer)
+	zap.L().Info(
+		"Jaeger has been started",
+		zap.String("local agent", cfg.Reporter.LocalAgentHostPort),
+		zap.String("collector", cfg.Reporter.CollectorEndpoint),
+	)
 	<-ctx.Done()
 
 	if err = closer.Close(); err != nil {

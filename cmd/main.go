@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/cache/redis"
 	"github.com/JMURv/golang-clean-template/internal/config"
@@ -40,7 +39,7 @@ func main() {
 	defer cancel()
 
 	conf := config.MustLoad(configPath)
-	mustRegisterLogger(conf.Server.Mode)
+	mustRegisterLogger(conf.Mode)
 
 	go prometheus.New(conf.Server.Port + 5).Start(ctx)
 	go jaeger.Start(ctx, conf.ServiceName, conf.Jaeger)
@@ -51,14 +50,6 @@ func main() {
 	svc := ctrl.New(repo, cache)
 	h := http.New(svc)
 
-	zap.L().Info(
-		fmt.Sprintf(
-			"Starting server on %v://%v:%v",
-			conf.Server.Scheme,
-			conf.Server.Domain,
-			conf.Server.Port,
-		),
-	)
 	go h.Start(conf.Server.Port)
 
 	c := make(chan os.Signal, 1)
@@ -71,7 +62,7 @@ func main() {
 	}
 
 	if err := cache.Close(); err != nil {
-		zap.L().Warn("Failed to close connection to Redis: ", zap.Error(err))
+		zap.L().Warn("Failed to close connection to cache: ", zap.Error(err))
 	}
 
 	if err := repo.Close(); err != nil {
