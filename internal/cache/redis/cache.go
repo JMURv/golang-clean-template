@@ -8,7 +8,6 @@ import (
 	"github.com/go-redis/redis/v8"
 	ot "github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
-	"log"
 	"time"
 )
 
@@ -27,7 +26,7 @@ func New(conf *cfg.RedisConfig) *Cache {
 
 	_, err := cli.Ping(context.Background()).Result()
 	if err != nil {
-		log.Fatalf("Failed to connect to Redis: %v", err)
+		zap.L().Fatal("Failed to connect to Redis", zap.Error(err))
 	}
 
 	return &Cache{cli: cli}

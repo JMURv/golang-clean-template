@@ -140,7 +140,14 @@ docker run -d --name pg-container \
   -e POSTGRES_PASSWORD=app_password \
   -e POSTGRES_DB=app_db_test \
   -p 5432:5432 \
-  -v pgdata:/var/lib/postgresql/data \
   postgres:15.0-alpine
 ```
+
+Spin up testing Redis for `E2E` tests:
+```shell
+docker run -d --name redis \
+   -p 6379:6379 \
+    redis:alpine
+```
+
 After that, run `task t-integ`
