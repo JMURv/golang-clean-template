@@ -1,0 +1,26 @@
+services:
+  redis:
+    container_name: redis
+    restart: always
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  db:
+    container_name: db
+    image: postgres:15.0-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${PG_APP_DB}
+      - POSTGRES_USER=${PG_APP_USER}
+      - POSTGRES_PASSWORD=${PG_APP_PASSWORD}
+      - POSTGRES_HOST=${PG_APP_HOST}
+      - POSTGRES_PORT=${PG_APP_PORT}
+    ports:
+      - "${PG_APP_PORT}:5432"
+    healthcheck:
+      test: 'psql -w -U ${PG_APP_USER} -d ${PG_APP_DB} -h localhost -c "SELECT 1"'
+      interval: 5s
+      timeout: 2s
+      retries: 5
+      start_period: 5s

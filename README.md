@@ -133,21 +133,28 @@ task k-down
 ```
 
 ## Tests
-Spin up testing DB for `E2E` tests:
+### E2E
+Head to `build` folder:
 ```shell
-docker run -d --name pg-container \
-  -e POSTGRES_USER=app_owner \
-  -e POSTGRES_PASSWORD=app_password \
-  -e POSTGRES_DB=app_db_test \
-  -p 5432:5432 \
-  postgres:15.0-alpine
+cd build
 ```
 
-Spin up testing Redis for `E2E` tests:
+Spin up all containers for `E2E` tests:
 ```shell
-docker run -d --name redis \
-   -p 6379:6379 \
-    redis:alpine
+task dc-test
+```
+Wait until all containers are ready and then run: `task t-integ`
+
+### Load
+Spin up all containers for `Load` tests:
+```shell
+task dc-test
 ```
 
-After that, run `task t-integ`
+Spin up main app locally.
+You'd like to replace DB section in `local.config.yaml` with `test.config.yaml` corresponding section.
+
+Run to start load testing:
+```shell
+task t-load
+```

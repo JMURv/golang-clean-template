@@ -11,7 +11,7 @@ import (
 
 func RegisterRoutes(mux *http.ServeMux, h *Handler) {
 	mux.HandleFunc("/api/unprotected", h.endpoint)
-	mux.HandleFunc("/api/protected", middleware.Apply(h.endpoint, middleware.AuthMiddleware))
+	mux.HandleFunc("/api/protected", middleware.Apply(h.endpoint, middleware.Auth))
 }
 
 func (h *Handler) endpoint(w http.ResponseWriter, r *http.Request) {

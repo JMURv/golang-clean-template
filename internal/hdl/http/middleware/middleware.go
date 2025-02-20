@@ -25,7 +25,7 @@ func Apply(h http.HandlerFunc, middleware ...func(http.Handler) http.Handler) ht
 	}
 }
 
-func AuthMiddleware(next http.Handler) http.Handler {
+func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")

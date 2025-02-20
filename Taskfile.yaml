@@ -72,4 +72,9 @@ tasks:
   t-integ:
     desc: Run integration tests
     cmds:
-      - "go test ./tests/E2E/..."
+      - "go test -v ./tests/E2E/..."
+
+  t-load:
+    desc: Start load testing
+    cmds:
+      - ./tests/load/start.sh
