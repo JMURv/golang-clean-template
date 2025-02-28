@@ -8,16 +8,15 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main ./cmd/main.go
+RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags "-s -w -extldflags '-static'" -o ./main ./cmd/main.go
+RUN apk add upx
+RUN upx ./main
 
-FROM alpine:3.19
-
-WORKDIR /app
-
+FROM scratch
 COPY ./internal/repo/db/migration /app/internal/repo/db/migration
-COPY --from=builder /app/main ./
 COPY --from=builder /app/go.mod ./go.mod
+COPY --from=builder /app/main ./
 
 EXPOSE 8080
 
-CMD ["./main"]
+ENTRYPOINT ["/main"]
