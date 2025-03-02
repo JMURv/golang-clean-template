@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/JMURv/golang-clean-template/internal/cache"
-	cfg "github.com/JMURv/golang-clean-template/internal/config"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/go-redis/redis/v8"
 	ot "github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
@@ -15,11 +15,11 @@ type Cache struct {
 	cli *redis.Client
 }
 
-func New(conf *cfg.RedisConfig) *Cache {
+func New(conf config.Config) *Cache {
 	cli := redis.NewClient(
 		&redis.Options{
-			Addr:     conf.Addr,
-			Password: conf.Pass,
+			Addr:     conf.Redis.Addr,
+			Password: conf.Redis.Pass,
 			DB:       0,
 		},
 	)

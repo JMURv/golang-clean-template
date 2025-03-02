@@ -31,7 +31,6 @@ func main() {
 	defer func() {
 		if err := recover(); err != nil {
 			zap.L().Panic("panic occurred", zap.Any("error", err))
-			os.Exit(1)
 		}
 	}()
 
@@ -42,11 +41,11 @@ func main() {
 	mustRegisterLogger(conf.Mode)
 
 	go prometheus.New(conf.Server.Port + 5).Start(ctx)
-	go jaeger.Start(ctx, conf.ServiceName, conf.Jaeger)
+	go jaeger.Start(ctx, conf.ServiceName, conf)
 
 	auth.New(conf.Secret)
-	cache := redis.New(conf.Redis)
-	repo := db.New(conf.DB)
+	cache := redis.New(conf)
+	repo := db.New(conf)
 	svc := ctrl.New(repo, cache)
 	h := http.New(svc)
 
@@ -68,6 +67,4 @@ func main() {
 	if err := repo.Close(); err != nil {
 		zap.L().Warn("Error closing repository", zap.Error(err))
 	}
-
-	os.Exit(0)
 }

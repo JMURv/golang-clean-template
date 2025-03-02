@@ -43,16 +43,3 @@ spec:
             httpGet:
               path: /health
               port: 8080
-
-          volumeMounts:
-            - name: app-config
-              mountPath: /app/configs/local.config.yaml
-              subPath: local.config.yaml
-
-      volumes:
-        - name: app-config
-          configMap:
-            name: app-cfg
-            items:
-              - key: config.yaml
-                path: local.config.yaml

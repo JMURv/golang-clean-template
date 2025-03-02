@@ -8,17 +8,17 @@ import (
 	"go.uber.org/zap"
 )
 
-func Start(ctx context.Context, serviceName string, conf *config.JaegerConfig) {
+func Start(ctx context.Context, serviceName string, conf config.Config) {
 	cfg := jaeger.Configuration{
 		ServiceName: serviceName,
 		Sampler: &jaeger.SamplerConfig{
-			Type:  conf.Sampler.Type,
-			Param: conf.Sampler.Param,
+			Type:  conf.Jaeger.Sampler.Type,
+			Param: conf.Jaeger.Sampler.Param,
 		},
 		Reporter: &jaeger.ReporterConfig{
-			LogSpans:           conf.Reporter.LogSpans,
-			LocalAgentHostPort: conf.Reporter.LocalAgentHostPort,
-			CollectorEndpoint:  conf.Reporter.CollectorEndpoint,
+			LogSpans:           conf.Jaeger.Reporter.LogSpans,
+			LocalAgentHostPort: conf.Jaeger.Reporter.LocalAgentHostPort,
+			CollectorEndpoint:  conf.Jaeger.Reporter.CollectorEndpoint,
 		},
 	}
 	tracer, closer, err := cfg.NewTracer()

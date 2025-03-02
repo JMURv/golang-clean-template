@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	conf "github.com/JMURv/golang-clean-template/internal/config"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
@@ -13,15 +13,15 @@ type Repository struct {
 	conn *sql.DB
 }
 
-func New(conf *conf.DBConfig) *Repository {
+func New(conf config.Config) *Repository {
 	conn, err := sql.Open(
 		"postgres", fmt.Sprintf(
 			"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-			conf.User,
-			conf.Password,
-			conf.Host,
-			conf.Port,
-			conf.Database,
+			conf.DB.User,
+			conf.DB.Password,
+			conf.DB.Host,
+			conf.DB.Port,
+			conf.DB.Database,
 		),
 	)
 	if err != nil {

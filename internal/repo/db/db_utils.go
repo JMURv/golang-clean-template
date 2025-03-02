@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	conf "github.com/JMURv/golang-clean-template/internal/config"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 )
 
-func applyMigrations(db *sql.DB, conf *conf.DBConfig) error {
+func applyMigrations(db *sql.DB, conf config.Config) error {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func applyMigrations(db *sql.DB, conf *conf.DBConfig) error {
 		filepath.Join(rootDir, "internal", "repo", "db", "migration"),
 	)
 
-	m, err := migrate.NewWithDatabaseInstance("file://"+path, conf.Database, driver)
+	m, err := migrate.NewWithDatabaseInstance("file://"+path, conf.DB.Database, driver)
 	if err != nil {
 		return err
 	}

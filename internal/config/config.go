@@ -49,8 +49,8 @@ type JaegerConfig struct {
 	} `yaml:"reporter"`
 }
 
-func MustLoad(configPath string) *Config {
-	conf := &Config{}
+func MustLoad(configPath string) Config {
+	conf := Config{}
 
 	_, err := os.Stat(configPath)
 	if err != nil && errors.Is(err, os.ErrNotExist) {

@@ -50,6 +50,7 @@ tasks:
     desc: Run k8s manifests
     cmds:
       - "kubectl apply -f k8s/cfg/cfg.yaml"
+      - "kubectl apply -f k8s/cfg/secret.yaml"
       - "kubectl apply -f k8s/svc.yaml"
       - "kubectl apply -f k8s/deploy.yaml"
 
@@ -57,5 +58,6 @@ tasks:
     desc: Remove k8s manifests
     cmds:
       - "kubectl delete -f k8s/cfg/cfg.yaml"
+      - "kubectl delete -f k8s/cfg/secret.yaml"
       - "kubectl delete -f k8s/svc.yaml"
       - "kubectl delete -f k8s/deploy.yaml"
