@@ -1,83 +1,98 @@
 package config
 
 import (
-	"errors"
 	"github.com/caarlos0/env/v9"
-	"go.uber.org/zap"
-	"gopkg.in/yaml.v3"
+	"github.com/joho/godotenv"
+	"log"
 	"os"
 )
 
 type Config struct {
-	Mode        string       `yaml:"mode" env:"MODE" envDefault:"dev"`
-	ServiceName string       `yaml:"serviceName" env:"SERVICE_NAME,required"`
-	Secret      string       `yaml:"secret" env:"SECRET,required"`
-	Server      ServerConfig `yaml:"server"`
-	DB          DBConfig     `yaml:"db"`
-	Redis       RedisConfig  `yaml:"redis"`
-	Jaeger      JaegerConfig `yaml:"jaeger"`
+	Mode        string `env:"MODE" envDefault:"dev"`
+	ServiceName string `env:"SERVICE_NAME" envDefault:"sso"`
+	Server      ServerConfig
+	Auth        authConfig
+	Email       smtpConfig
+	DB          dbConfig
+	Minio       s3Config
+	Redis       redisConfig
+	Jaeger      jaegerConfig
 }
 
 type ServerConfig struct {
-	Port   int    `yaml:"port" env:"SERVER_PORT,required"`
-	Scheme string `yaml:"scheme" env:"SERVER_SCHEME" envDefault:"http"`
-	Domain string `yaml:"domain" env:"SERVER_DOMAIN" envDefault:"localhost"`
+	Scheme   string `env:"SERVER_SCHEME" envDefault:"http"`
+	Domain   string `env:"SERVER_DOMAIN" envDefault:"localhost"`
+	Port     int    `env:"SERVER_HTTP_PORT,required"`
+	GRPCPort int    `env:"SERVER_GRPC_PORT" envDefault:"50050"`
+	PromPort int    `env:"SERVER_PROM_PORT" envDefault:"8085"`
 }
 
-type DBConfig struct {
-	Host     string `yaml:"host" env:"DB_HOST" envDefault:"localhost"`
-	Port     int    `yaml:"port" env:"DB_PORT" envDefault:"5432"`
-	User     string `yaml:"user" env:"DB_USER" envDefault:"postgres"`
-	Password string `yaml:"password" env:"DB_PASSWORD" envDefault:"postgres"`
-	Database string `yaml:"database" env:"DB_DATABASE" envDefault:"db"`
+type authConfig struct {
+	JWT struct {
+		Secret string `env:"JWT_SECRET,required"`
+		Issuer string `env:"JWT_ISSUER,required"`
+	}
+	Captcha struct {
+		SiteKey string `env:"CAPTCHA_SITE_KEY"`
+		Secret  string `env:"CAPTCHA_SECRET"`
+	}
 }
 
-type RedisConfig struct {
-	Addr string `yaml:"addr" env:"REDIS_ADDR" envDefault:"localhost:6379"`
-	Pass string `yaml:"pass" env:"REDIS_PASS" envDefault:""`
+type smtpConfig struct {
+	Server string `env:"EMAIL_SERVER" envDefault:"smtp.gmail.com"`
+	Port   int    `env:"EMAIL_PORT" envDefault:"587"`
+	User   string `env:"EMAIL_USER" envDefault:""`
+	Pass   string `env:"EMAIL_PASS" envDefault:""`
+	Admin  string `env:"EMAIL_ADMIN" envDefault:""`
 }
 
-type JaegerConfig struct {
+type dbConfig struct {
+	Host     string `env:"POSTGRES_HOST" envDefault:"localhost"`
+	Port     int    `env:"POSTGRES_PORT" envDefault:"5432"`
+	User     string `env:"POSTGRES_USER" envDefault:"app_owner"`
+	Password string `env:"POSTGRES_PASSWORD" envDefault:"password"`
+	Database string `env:"POSTGRES_DB" envDefault:"app_db"`
+}
+
+type s3Config struct {
+	Addr      string `env:"MINIO_ADDR" envDefault:"localhost:9000"`
+	AccessKey string `env:"MINIO_ACCESS_KEY" envDefault:""`
+	SecretKey string `env:"MINIO_SECRET_KEY" envDefault:""`
+	Bucket    string `env:"MINIO_BUCKET" envDefault:"app"`
+	UseSSL    bool   `env:"MINIO_SSL" envDefault:"false"`
+}
+
+type redisConfig struct {
+	Addr string `env:"REDIS_ADDR" envDefault:"localhost:6379"`
+	Pass string `env:"REDIS_PASS" envDefault:""`
+}
+
+type jaegerConfig struct {
 	Sampler struct {
-		Type  string  `yaml:"type" env:"JAEGER_SAMPLER_TYPE"`
-		Param float64 `yaml:"param" env:"JAEGER_SAMPLER_PARAM"`
+		Type  string  `env:"JAEGER_SAMPLER_TYPE" envDefault:"const"`
+		Param float64 `env:"JAEGER_SAMPLER_PARAM" envDefault:"1"`
 	} `yaml:"sampler"`
 	Reporter struct {
-		LogSpans           bool   `yaml:"LogSpans" env:"JAEGER_REPORTER_LOGSPANS"`
-		LocalAgentHostPort string `yaml:"LocalAgentHostPort" env:"JAEGER_REPORTER_LOCALAGENT"`
-		CollectorEndpoint  string `yaml:"CollectorEndpoint" env:"JAEGER_REPORTER_COLLECTOR"`
+		LogSpans           bool   `env:"JAEGER_REPORTER_LOGSPANS" envDefault:"true"`
+		LocalAgentHostPort string `env:"JAEGER_REPORTER_LOCALAGENT" envDefault:"localhost:6831"`
+		CollectorEndpoint  string `env:"JAEGER_REPORTER_COLLECTOR" envDefault:"http://localhost:14268/api/traces"`
 	} `yaml:"reporter"`
 }
 
-func MustLoad(configPath string) Config {
-	conf := Config{}
-
-	_, err := os.Stat(configPath)
-	if err != nil && errors.Is(err, os.ErrNotExist) {
-		if err := env.Parse(conf); err != nil {
-			panic("failed to parse environment variables: " + err.Error())
+func MustLoad(path string) Config {
+	if err := godotenv.Load(path); err != nil {
+		if !os.IsNotExist(err) {
+			panic("failed to load .env file: " + err.Error())
 		}
-		zap.L().Info(
-			"Load configuration from environment",
-		)
-
-		return conf
-	} else if err != nil {
-		panic("failed to stat file: " + err.Error())
+		log.Println("No .env file found, using system environment variables")
+	} else {
+		log.Println("Loaded environment variables from: " + path)
 	}
 
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		panic("failed to read config: " + err.Error())
+	conf := Config{}
+	if err := env.Parse(&conf); err != nil {
+		panic("failed to parse environment variables: " + err.Error())
 	}
-
-	if err = yaml.Unmarshal(data, conf); err != nil {
-		panic("failed to unmarshal cgonfig: " + err.Error())
-	}
-
-	zap.L().Info(
-		"Load configuration from yaml",
-		zap.String("path", configPath),
-	)
+	log.Println("Load configuration from environment")
 	return conf
 }

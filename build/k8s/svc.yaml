@@ -13,6 +13,11 @@ spec:
       targetPort: 8080
       nodePort: 30080
 
+    - name: grpc
+      port: 50050
+      targetPort: 50050
+      nodePort: 30050
+
     - name: metrics
       port: 8085
       targetPort: 8085

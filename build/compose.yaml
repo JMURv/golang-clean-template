@@ -1,0 +1,30 @@
+name: app
+services:
+  redis:
+    extends:
+      file: compose-base.yaml
+      service: redis
+
+  db:
+    extends:
+      file: compose-base.yaml
+      service: db
+
+  minio:
+    extends:
+      file: compose-base.yaml
+      service: minio
+
+  backend:
+    extends:
+      file: compose-base.yaml
+      service: backend
+
+volumes:
+  pg_data:
+  minio_data:
+  redis_data:
+
+networks:
+  app:
+    name: app

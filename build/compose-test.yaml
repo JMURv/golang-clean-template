@@ -1,0 +1,22 @@
+name: app
+services:
+  redis:
+    extends:
+      file: compose-base.yaml
+      service: redis
+    volumes: !reset []
+
+  db:
+    extends:
+      file: compose-base.yaml
+      service: db
+    volumes: !reset []
+
+  backend:
+    extends:
+      file: compose-base.yaml
+      service: backend
+
+networks:
+  app:
+    name: app

@@ -1,18 +1,19 @@
+# common
 *~
 *.out
 .idea
 !.gitkeep
+tmp
 
+# build
+bin/*
+!bin/.gitkeep
+
+# configs
 .env*
 !.env.example
 !.env.test
 
-*config.yml
-*config.yaml
-!example.config.yml
-!example.config.yaml
-!test.config.yml
-!test.config.yaml
-
-bin/*
-vendor
+# observe
+!loki-config.yaml
+!promtail-config.yaml

@@ -1,37 +1,44 @@
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
-  gocyclo:
-    min-complexity: 10
+version: "2"
+run:
+  issues-exit-code: 1
+  tests: false
 
 linters:
-  enable-all: true
-  disable:
-    - "varcheck"
-    - "nosnakecase"
-    - "maligned"
-    - "structcheck"
-    - "deadcode"
-    - "scopelint"
-    - "golint"
-    - "exhaustivestruct"
-    - "ifshort"
-    - "interfacer"
+  default: all
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    gocyclo:
+      min-complexity: 10
 
-run:
-  timeout: 5m
-  issues-exit-code: 1
-  tests: true
+  exclusions:
+    generated: lax
+    rules:
+      - linters:
+          - gocyclo
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 
 issues:
-  exclude-use-default: false
-  max-same-issues: 0
   max-issues-per-linter: 0
+  max-same-issues: 0
   new-from-rev: HEAD
   new: true
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - gocyclo
-        - gofmt
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+      - _test.go

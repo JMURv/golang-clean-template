@@ -1,11 +1,17 @@
 version: 3
 
 vars:
-  OS: go env GOOS
-  ARCH: go env GOARCH
-  BIN_DIR: "bin/{{.OS}}-{{.ARCH}}"
+  DEV_ENV_FILE: "configs/envs/.env.dev"
+  DEV_DOCKER_COMPOSE_PATH: "compose-dev.yaml"
+
+  PROD_ENV_FILE: "configs/envs/.env.prod"
+  PROD_DOCKER_COMPOSE_PATH: "compose-base.yaml"
+
+  TEST_ENV_FILE: "configs/envs/.env.test"
+  TEST_DOCKER_COMPOSE_PATH: "compose-test.yaml"
 
 tasks:
+  # LOCAL
   run:
     desc: Run app
     cmds:
@@ -15,6 +21,14 @@ tasks:
     desc: Build app
     cmds:
       - go build -o bin/main ./cmd/main.go
+  # END
+
+  # UTILS
+  doc:
+    desc: Generate docs
+    cmds:
+      - swag fmt
+      - swag init -g ./cmd/main.go -o ./api/rest/v1 --parseDependency  --parseInternal
 
   lint:
     desc: Lint app
@@ -30,7 +44,52 @@ tasks:
     desc: Generate mocks
     cmds:
       - mockgen -source="./internal/ctrl/ctrl.go" -destination="tests/mocks/mock_ctrl.go" -package=mocks
+  # END
 
+  # DOCKER
+  dc-dev:
+    desc: Run dev compose
+    cmds:
+      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} up --watch"
+
+  dc-dev-build:
+    desc: Run dev compose
+    cmds:
+      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} up --build --watch"
+
+  dc-dev-down:
+    desc: Shutdown dev compose
+    cmds:
+      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} down"
+
+  dc-test:
+    desc: Run integration tests helper containers
+    cmds:
+      - "docker compose --env-file {{.TEST_ENV_FILE}} -f {{.TEST_DOCKER_COMPOSE_PATH}} up"
+
+  dc-test-down:
+    desc: Shutdown integration tests helper containers
+    cmds:
+      - "docker compose -f {{.TEST_DOCKER_COMPOSE_PATH}} down"
+
+  k-up:
+    desc: Run k8s manifests
+    cmds:
+      - "kubectl apply -f backend/build/k8s/cfg/cfg.yaml"
+      - "kubectl apply -f backend/build/k8s/cfg/secret.yaml"
+      - "kubectl apply -f backend/build/k8s/svc.yaml"
+      - "kubectl apply -f backend/build/k8s/deploy.yaml"
+
+  k-down:
+    desc: Remove k8s manifests
+    cmds:
+      - "kubectl delete -f backend/build/k8s/cfg/cfg.yaml"
+      - "kubectl delete -f backend/build/k8s/cfg/secret.yaml"
+      - "kubectl delete -f backend/build/k8s/svc.yaml"
+      - "kubectl delete -f backend/build/k8s/deploy.yaml"
+  # END
+
+  # TESTS
   t:
     desc: Run tests
     cmds:
@@ -73,8 +132,4 @@ tasks:
     desc: Run integration tests
     cmds:
       - "go test -v ./tests/E2E/..."
-
-  t-load:
-    desc: Start load testing
-    cmds:
-      - ./tests/load/start.sh
+  # END

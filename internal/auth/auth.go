@@ -1,37 +1,48 @@
 package auth
 
 import (
-	"errors"
-	jwt "github.com/golang-jwt/jwt/v5"
+	"context"
+	"github.com/JMURv/golang-clean-template/internal/auth/captcha"
+	"github.com/JMURv/golang-clean-template/internal/auth/jwt"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
-const AccessTokenDuration = time.Hour * 72
-
-var Au *Auth
-var ErrInvalidCredentials = errors.New("invalid credentials")
-var ErrInvalidToken = errors.New("invalid token")
-
-type AuthService interface {
-	NewToken(uid uuid.UUID) (string, error)
-	VerifyToken(tokenStr string) (map[string]any, error)
-	HashPassword(pswd string) (string, error)
+type Core interface {
+	Hash(pswd string) (string, error)
 	ComparePasswords(hashed, pswd []byte) error
+	jwt.Port
+	captcha.Port
 }
 
 type Auth struct {
-	secret []byte
+	jwt     jwt.Port
+	captcha captcha.Port
 }
 
-func New(secret string) {
-	Au = &Auth{secret: []byte(secret)}
+func New(conf config.Config) *Auth {
+	return &Auth{
+		jwt:     jwt.New(conf),
+		captcha: captcha.New(conf),
+	}
 }
 
-func (a *Auth) HashPassword(pswd string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(pswd), 7)
-	return string(bytes), err
+func (a *Auth) Hash(val string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(val), bcrypt.MinCost)
+	if err != nil {
+		zap.L().Error(
+			"Failed to generate hash",
+			zap.String("val", val),
+			zap.Error(err),
+		)
+
+		return "", err
+	}
+
+	return string(bytes), nil
 }
 
 func (a *Auth) ComparePasswords(hashed, pswd []byte) error {
@@ -41,35 +52,26 @@ func (a *Auth) ComparePasswords(hashed, pswd []byte) error {
 	return nil
 }
 
-func (a *Auth) NewToken(uid uuid.UUID) (string, error) {
-	token := jwt.NewWithClaims(
-		jwt.SigningMethodHS256, jwt.MapClaims{
-			"uid": uid,
-			"exp": time.Now().Add(AccessTokenDuration).Unix(),
-		},
-	)
-
-	return token.SignedString(a.secret)
+func (a *Auth) GetAccessTime() time.Time {
+	return a.jwt.GetAccessTime()
 }
 
-func (a *Auth) VerifyToken(tokenStr string) (map[string]any, error) {
-	token, err := jwt.Parse(
-		tokenStr, func(token *jwt.Token) (any, error) {
-			return a.secret, nil
-		},
-	)
+func (a *Auth) GetRefreshTime() time.Time {
+	return a.jwt.GetRefreshTime()
+}
 
-	if err != nil {
-		return nil, err
-	}
+func (a *Auth) GenPair(ctx context.Context, uid uuid.UUID) (string, string, error) {
+	return a.jwt.GenPair(ctx, uid)
+}
 
-	if !token.Valid {
-		return nil, ErrInvalidToken
-	}
+func (a *Auth) NewToken(ctx context.Context, uid uuid.UUID, d time.Duration) (string, error) {
+	return a.jwt.NewToken(ctx, uid, d)
+}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		return claims, nil
-	} else {
-		return nil, ErrInvalidToken
-	}
+func (a *Auth) ParseClaims(ctx context.Context, tokenStr string) (jwt.Claims, error) {
+	return a.jwt.ParseClaims(ctx, tokenStr)
+}
+
+func (a *Auth) VerifyRecaptcha(token string, action captcha.Actions) (bool, error) {
+	return a.captcha.VerifyRecaptcha(token, action)
 }

@@ -9,11 +9,21 @@ import (
 	"time"
 )
 
-func RegisterRoutes(mux *http.ServeMux, h *Handler) {
-	mux.HandleFunc("/api/unprotected", h.endpoint)
-	mux.HandleFunc("/api/protected", middleware.Apply(h.endpoint, middleware.Auth))
+func (h *Handler) RegisterRoutes() {
+	h.router.Get("/unprotected", h.endpoint)
+	h.router.With(middleware.Auth(h.au)).Get("/protected", h.endpoint)
 }
 
+// endpoint godoc
+//
+//	@Summary		Test endpoint
+//	@Description	Test endpoint description
+//	@Tags			Authentication
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	nil
+//	@Failure		500	{object}	utils.ErrorsResponse	"internal error"
+//	@Router			/protected [get]
 func (h *Handler) endpoint(w http.ResponseWriter, r *http.Request) {
 	const op = "app.endpoint.hdl"
 	s, c := time.Now(), http.StatusOK

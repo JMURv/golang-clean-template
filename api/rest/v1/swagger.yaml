@@ -1,0 +1,29 @@
+definitions:
+  github_com_JMURv_golang-clean-template_internal_hdl_http_utils.ErrorsResponse:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+    type: object
+info:
+  contact: {}
+paths:
+  /protected:
+    get:
+      consumes:
+      - application/json
+      description: Test endpoint description
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/github_com_JMURv_golang-clean-template_internal_hdl_http_utils.ErrorsResponse'
+      summary: Test endpoint
+      tags:
+      - Authentication
+swagger: "2.0"

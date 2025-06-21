@@ -27,15 +27,11 @@ func Start(ctx context.Context, serviceName string, conf config.Config) {
 	}
 
 	ot.SetGlobalTracer(tracer)
-	zap.L().Info(
-		"Jaeger has been started",
-		zap.String("local agent", cfg.Reporter.LocalAgentHostPort),
-		zap.String("collector", cfg.Reporter.CollectorEndpoint),
-	)
+	zap.L().Info("Jaeger has been started")
 	<-ctx.Done()
 
 	if err = closer.Close(); err != nil {
-		zap.L().Debug("Error shutting down Jaeger", zap.Error(err))
+		zap.L().Warn("Error shutting down Jaeger", zap.Error(err))
 	}
 	zap.L().Info("Jaeger has been stopped")
 }
