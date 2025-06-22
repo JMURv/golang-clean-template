@@ -18,7 +18,6 @@ func (h *Handler) RegisterRoutes() {
 //
 //	@Summary		Test endpoint
 //	@Description	Test endpoint description
-//	@Tags			Authentication
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	nil

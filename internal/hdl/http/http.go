@@ -2,13 +2,14 @@ package http
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	_ "github.com/JMURv/golang-clean-template/api/rest/v1"
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	mid "github.com/JMURv/golang-clean-template/internal/hdl/http/middleware"
 	"github.com/JMURv/golang-clean-template/internal/hdl/http/utils"
-	chi "github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.uber.org/zap"
@@ -65,7 +66,7 @@ func (h *Handler) Start(port int) {
 	)
 
 	err := h.srv.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		zap.L().Error("Server error", zap.Error(err))
 	}
 }

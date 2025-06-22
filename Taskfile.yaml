@@ -33,7 +33,7 @@ tasks:
   lint:
     desc: Lint app
     cmds:
-      - "golangci-lint run"
+      - "golangci-lint run --fix"
 
   pb:
     desc: Gen Proto file

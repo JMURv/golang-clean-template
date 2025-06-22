@@ -29,7 +29,12 @@ func StatusResponse(w http.ResponseWriter, statusCode int) {
 func SuccessResponse(w http.ResponseWriter, statusCode int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(data)
+
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		zap.L().Error("failed to encode success response", zap.Error(err))
+
+		return
+	}
 }
 
 func ErrResponse(w http.ResponseWriter, statusCode int, err error) {
@@ -37,20 +42,21 @@ func ErrResponse(w http.ResponseWriter, statusCode int, err error) {
 	w.WriteHeader(statusCode)
 
 	msgs := make([]string, 0, 1)
-	if errs, ok := err.(validator.ValidationErrors); ok {
+
+	var errs validator.ValidationErrors
+
+	if errors.As(err, &errs) {
 		msgs = make([]string, 0, len(errs))
 		for _, fe := range errs {
 			msgs = append(msgs, fmt.Sprintf("%s failed on the %s rule", fe.Field(), fe.Tag()))
 		}
-	} else {
-		msgs = append(msgs, err.Error())
 	}
 
-	json.NewEncoder(w).Encode(
-		&ErrorsResponse{
-			Errors: msgs,
-		},
-	)
+	if err = json.NewEncoder(w).Encode(&ErrorsResponse{Errors: msgs}); err != nil {
+		zap.L().Error("failed to encode error response", zap.Error(err))
+
+		return
+	}
 }
 
 func ParsePaginationValues(r *http.Request) (int, int) {

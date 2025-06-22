@@ -5,6 +5,8 @@ run:
 
 linters:
   default: all
+  disable:
+    - depguard
   settings:
     errcheck:
       check-type-assertions: true

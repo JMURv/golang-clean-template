@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/JMURv/golang-clean-template/internal/config"
-	minio "github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"go.uber.org/zap"
 	"time"

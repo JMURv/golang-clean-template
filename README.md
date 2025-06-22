@@ -103,7 +103,7 @@ Run prod:
 task dc-prod
 ```
 
-Also there is ability to up svcs like: `prometheus`, `jaeger`, `node-exporter`, `grafana`:
+Also, there is ability to up svcs like: `prometheus`, `jaeger`, `node-exporter`, `grafana`:
 ```shell
 task dc-observe
 ```

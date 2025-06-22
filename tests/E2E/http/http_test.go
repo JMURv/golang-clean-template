@@ -9,6 +9,8 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	hdl "github.com/JMURv/golang-clean-template/internal/hdl/http"
 	"github.com/JMURv/golang-clean-template/internal/repo/db"
+	"github.com/JMURv/golang-clean-template/internal/repo/s3"
+	"github.com/JMURv/golang-clean-template/internal/smtp"
 	"go.uber.org/zap"
 	"net/http"
 	"net/http/httptest"
@@ -27,13 +29,12 @@ func setupTestServer() (*httptest.Server, func()) {
 	conf := config.MustLoad("config/.env")
 
 	au := auth.New(conf)
-	repo := db.New(conf)
 	cache := redis.New(conf)
+	repo := db.New(conf)
 	svc := ctrl.New(au, repo, cache, s3.New(conf), smtp.New(conf))
-	h := hdl.New(svc)
-
+	h := hdl.New(au, svc)
+	h.RegisterRoutes()
 	mux := http.NewServeMux()
-	hdl.RegisterRoutes(mux, h)
 
 	cleanupFunc := func() {
 		conn, err := sql.Open(

@@ -3,12 +3,14 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/cache"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/go-redis/redis/v8"
 	ot "github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
-	"time"
 )
 
 type Cache struct {
@@ -42,7 +44,7 @@ func (c *Cache) GetToStruct(ctx context.Context, key string, dest any) error {
 	defer span.Finish()
 
 	val, err := c.cli.Get(ctx, key).Bytes()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		zap.L().Info(
 			"[CACHE] --> MISS",
 			zap.String("op", op), zap.String("key", key),
