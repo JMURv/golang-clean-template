@@ -24,6 +24,14 @@ tasks:
   # END
 
   # UTILS
+  pre:
+    desc: Run pre-commit tasks
+    cmds:
+      - "task doc"
+      - "task pb"
+      - "task mocks"
+      - "task lint"
+
   doc:
     desc: Generate docs
     cmds:
@@ -44,6 +52,7 @@ tasks:
     desc: Generate mocks
     cmds:
       - mockgen -source="./internal/ctrl/ctrl.go" -destination="tests/mocks/mock_ctrl.go" -package=mocks
+      - mockgen -source="./internal/auth/auth.go" -destination="tests/mocks/mock_auth.go" -package=mocks
   # END
 
   # DOCKER

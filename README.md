@@ -9,7 +9,12 @@ This is required to build and push docker image.
 Configuration files for local dev placed in `/config`
 
 Configuration files for docker dev placed in `/build/configs/envs`
-- Create your own `.env` based on `.env.example`
+- Create your own `.env` based on `.env.example`:
+```shell
+cp config/.env.example config/.env && \
+cp build/configs/envs/.env.example build/configs/envs/.env.dev && \
+cp build/configs/envs/.env.example build/configs/envs/.env.prod
+```
 
 ## Build
 ### Locally

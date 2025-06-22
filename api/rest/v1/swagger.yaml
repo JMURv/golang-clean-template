@@ -24,6 +24,4 @@ paths:
           schema:
             $ref: '#/definitions/github_com_JMURv_golang-clean-template_internal_hdl_http_utils.ErrorsResponse'
       summary: Test endpoint
-      tags:
-      - Authentication
 swagger: "2.0"

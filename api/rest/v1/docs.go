@@ -24,9 +24,6 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Authentication"
-                ],
                 "summary": "Test endpoint",
                 "responses": {
                     "200": {
