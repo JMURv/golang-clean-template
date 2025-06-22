@@ -1,14 +1,14 @@
 version: 3
 
 vars:
-  DEV_ENV_FILE: "configs/envs/.env.dev"
-  DEV_DOCKER_COMPOSE_PATH: "compose-dev.yaml"
+  DEV_ENV_FILE: "build/configs/envs/.env.dev"
+  DEV_DOCKER_COMPOSE_PATH: "build/compose-dev.yaml"
 
-  PROD_ENV_FILE: "configs/envs/.env.prod"
-  PROD_DOCKER_COMPOSE_PATH: "compose-base.yaml"
+  PROD_ENV_FILE: "build/configs/envs/.env.prod"
+  PROD_DOCKER_COMPOSE_PATH: "build/compose.yaml"
 
-  TEST_ENV_FILE: "configs/envs/.env.test"
-  TEST_DOCKER_COMPOSE_PATH: "compose-test.yaml"
+  TEST_ENV_FILE: "build/configs/envs/.env.test"
+  TEST_DOCKER_COMPOSE_PATH: "build/compose-test.yaml"
 
 tasks:
   # LOCAL
@@ -20,7 +20,7 @@ tasks:
   build:
     desc: Build app
     cmds:
-      - go build -o bin/main ./cmd/main.go
+      - go build -o bin/main cmd/main.go
   # END
 
   # UTILS
@@ -47,6 +47,11 @@ tasks:
   # END
 
   # DOCKER
+  dc-prod:
+    desc: Run prod compose
+    cmds:
+      - "docker compose --env-file {{.PROD_ENV_FILE}} -f {{.PROD_DOCKER_COMPOSE_PATH}} up --watch"
+
   dc-dev:
     desc: Run dev compose
     cmds:
@@ -75,18 +80,18 @@ tasks:
   k-up:
     desc: Run k8s manifests
     cmds:
-      - "kubectl apply -f backend/build/k8s/cfg/cfg.yaml"
-      - "kubectl apply -f backend/build/k8s/cfg/secret.yaml"
-      - "kubectl apply -f backend/build/k8s/svc.yaml"
-      - "kubectl apply -f backend/build/k8s/deploy.yaml"
+      - "kubectl apply -f build/k8s/cfg/cfg.yaml"
+      - "kubectl apply -f build/k8s/cfg/secret.yaml"
+      - "kubectl apply -f build/k8s/svc.yaml"
+      - "kubectl apply -f build/k8s/deploy.yaml"
 
   k-down:
     desc: Remove k8s manifests
     cmds:
-      - "kubectl delete -f backend/build/k8s/cfg/cfg.yaml"
-      - "kubectl delete -f backend/build/k8s/cfg/secret.yaml"
-      - "kubectl delete -f backend/build/k8s/svc.yaml"
-      - "kubectl delete -f backend/build/k8s/deploy.yaml"
+      - "kubectl delete -f build/k8s/cfg/cfg.yaml"
+      - "kubectl delete -f build/k8s/cfg/secret.yaml"
+      - "kubectl delete -f build/k8s/svc.yaml"
+      - "kubectl delete -f build/k8s/deploy.yaml"
   # END
 
   # TESTS

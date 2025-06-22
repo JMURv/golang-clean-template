@@ -3,18 +3,43 @@ kind: ConfigMap
 metadata:
   name: app-cfg
 data:
-  MODE: "dev"
-  SERVICE_NAME: "svc-name"
-
-  SERVER_PORT: "8080"
+  # APP
+  MODE: "prod"
+  SERVICE_NAME: "app"
   SERVER_SCHEME: "http"
   SERVER_DOMAIN: "localhost"
 
-  DB_HOST: "localhost"
-  DB_PORT: "5432"
+  SERVER_HTTP_PORT: "8080"
+  SERVER_GRPC_PORT: "50050"
+  SERVER_PROM_PORT: "8085"
 
+  # POSTGRES
+  POSTGRES_DB: "sso_db"
+  POSTGRES_USER: "sso_owner"
+  POSTGRES_HOST: "localhost"
+  POSTGRES_PORT: "5432"
+
+  # SECRETS
+  JWT_ISSUER: "APP"
+
+  # CAPTCHA
+  CAPTCHA_SITE_KEY: ""
+
+  # EMAIL
+  EMAIL_SERVER: "smtp.gmail.com"
+  EMAIL_PORT: "587"
+  EMAIL_USER: ""
+  EMAIL_ADMIN: ""
+
+  # MINIO
+  MINIO_ADDR: "localhost:9000"
+  MINIO_BUCKET: "app"
+  MINIO_SSL: "false"
+
+  # REDIS
   REDIS_ADDR: "localhost:6379"
 
+  # JAEGER
   JAEGER_SAMPLER_TYPE: "const"
   JAEGER_SAMPLER_PARAM: "1"
   JAEGER_REPORTER_LOGSPANS: "true"

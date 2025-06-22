@@ -10,4 +10,7 @@ RUN go mod download
 COPY . .
 
 RUN apk add --no-cache curl
+
+EXPOSE 8080 8085 50050
+
 CMD ["air"]
