@@ -16,7 +16,7 @@ services:
       service: minio
 
   backend:
-    image: jmurv/dev-app-backend:latest
+    image: jmurv/app-backend:latest-dev
     build:
       context: ../
       dockerfile: ./build/docker/Dockerfile.dev

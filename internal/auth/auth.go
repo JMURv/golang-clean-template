@@ -2,13 +2,14 @@ package auth
 
 import (
 	"context"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/auth/captcha"
 	"github.com/JMURv/golang-clean-template/internal/auth/jwt"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type Core interface {

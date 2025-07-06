@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"

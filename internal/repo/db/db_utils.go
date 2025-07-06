@@ -3,13 +3,14 @@ package db
 import (
 	"database/sql"
 	"errors"
+	"os"
+	"path/filepath"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/pgx/v5"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"go.uber.org/zap"
-	"os"
-	"path/filepath"
 )
 
 func applyMigrations(db *sql.DB, conf config.Config) error {

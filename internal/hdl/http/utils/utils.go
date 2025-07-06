@@ -4,17 +4,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	"github.com/JMURv/golang-clean-template/internal/hdl/validation"
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
-	"io"
-	"mime/multipart"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 type ErrorsResponse struct {
@@ -42,19 +44,21 @@ func ErrResponse(w http.ResponseWriter, statusCode int, err error) {
 	w.WriteHeader(statusCode)
 
 	msgs := make([]string, 0, 1)
-
-	var errs validator.ValidationErrors
-
-	if errors.As(err, &errs) {
+	if errs, ok := err.(validator.ValidationErrors); ok {
 		msgs = make([]string, 0, len(errs))
 		for _, fe := range errs {
 			msgs = append(msgs, fmt.Sprintf("%s failed on the %s rule", fe.Field(), fe.Tag()))
 		}
+	} else {
+		msgs = append(msgs, err.Error())
 	}
 
-	if err = json.NewEncoder(w).Encode(&ErrorsResponse{Errors: msgs}); err != nil {
-		zap.L().Error("failed to encode error response", zap.Error(err))
-
+	if err := json.NewEncoder(w).Encode(
+		&ErrorsResponse{
+			Errors: msgs,
+		},
+	); err != nil {
+		zap.L().Error("failed to encode err response", zap.Error(err))
 		return
 	}
 }
@@ -94,9 +98,41 @@ func ParseAndValidate(w http.ResponseWriter, r *http.Request, dst any) bool {
 	return true
 }
 
-var ErrInvalidFileUpload = errors.New("invalid file upload")
-var ErrFileTooLarge = errors.New("file too large")
-var ErrInvalidFileType = errors.New("invalid file type")
+func GetAuthCookies(accessStr string, refreshStr string) (*http.Cookie, *http.Cookie) {
+	access := &http.Cookie{
+		Name:     config.AccessCookieName,
+		Value:    accessStr,
+		Expires:  time.Now().Add(config.AccessTokenDuration),
+		HttpOnly: true,
+		Secure:   true,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+	}
+
+	refresh := &http.Cookie{
+		Name:     config.RefreshCookieName,
+		Value:    refreshStr,
+		Expires:  time.Now().Add(config.RefreshTokenDuration),
+		HttpOnly: true,
+		Secure:   true,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+	}
+
+	return access, refresh
+}
+
+func SetAuthCookies(w http.ResponseWriter, access, refresh string) {
+	accessCookie, refreshCookie := GetAuthCookies(access, refresh)
+	http.SetCookie(w, accessCookie)
+	http.SetCookie(w, refreshCookie)
+}
+
+var (
+	ErrInvalidFileUpload = errors.New("invalid file upload")
+	ErrFileTooLarge      = errors.New("file too large")
+	ErrInvalidFileType   = errors.New("invalid file type")
+)
 
 func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileRequest) error {
 	file, header, err := r.FormFile(fieldName)

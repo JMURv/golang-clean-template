@@ -2,6 +2,7 @@ package jaeger
 
 import (
 	"context"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
 	ot "github.com/opentracing/opentracing-go"
 	jaeger "github.com/uber/jaeger-client-go/config"

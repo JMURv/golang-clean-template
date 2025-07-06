@@ -1,12 +1,13 @@
 package http
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/hdl/http/middleware"
 	"github.com/JMURv/golang-clean-template/internal/hdl/http/utils"
 	metrics "github.com/JMURv/golang-clean-template/internal/observability/metrics/prometheus"
 	ot "github.com/opentracing/opentracing-go"
-	"net/http"
-	"time"
 )
 
 func (h *Handler) RegisterRoutes() {

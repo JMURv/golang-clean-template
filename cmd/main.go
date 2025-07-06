@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/cache/redis"
 	"github.com/JMURv/golang-clean-template/internal/config"
@@ -14,9 +18,6 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 	"github.com/JMURv/golang-clean-template/internal/smtp"
 	"go.uber.org/zap"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func mustRegisterLogger(mode string) {

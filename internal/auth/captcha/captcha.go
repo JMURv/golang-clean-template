@@ -2,12 +2,13 @@ package captcha
 
 import (
 	"encoding/json"
-	"github.com/JMURv/golang-clean-template/internal/config"
-	"github.com/JMURv/golang-clean-template/internal/dto"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/JMURv/golang-clean-template/internal/config"
+	"github.com/JMURv/golang-clean-template/internal/dto"
+	"go.uber.org/zap"
 )
 
 type Port interface {

@@ -4,41 +4,36 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/auth"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/hdl/http/utils"
 	metrics "github.com/JMURv/golang-clean-template/internal/observability/metrics/prometheus"
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
-	"net/http"
-	"strings"
-	"time"
 )
-
-var ErrAuthHeaderIsMissing = errors.New("authorization header is missing")
-var ErrInvalidTokenFormat = errors.New("invalid token format")
 
 func Auth(au auth.Core) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
-				header := r.Header.Get("Authorization")
-				if header == "" {
-					utils.ErrResponse(w, http.StatusForbidden, ErrAuthHeaderIsMissing)
-
-					return
+				access, err := r.Cookie(config.AccessCookieName)
+				if err != nil {
+					if errors.Is(err, http.ErrNoCookie) {
+						utils.ErrResponse(w, http.StatusUnauthorized, err)
+						return
+					} else {
+						zap.L().Error("failed to get access cookie", zap.Error(err))
+						utils.ErrResponse(w, http.StatusInternalServerError, err)
+						return
+					}
 				}
 
-				token := strings.TrimPrefix(header, "Bearer ")
-				if token == header {
-					utils.ErrResponse(w, http.StatusForbidden, ErrInvalidTokenFormat)
-
-					return
-				}
-
-				claims, err := au.ParseClaims(r.Context(), token)
+				claims, err := au.ParseClaims(r.Context(), access.Value)
 				if err != nil {
 					utils.ErrResponse(w, http.StatusForbidden, err)
-
 					return
 				}
 

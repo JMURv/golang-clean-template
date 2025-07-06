@@ -2,12 +2,13 @@ package jwt
 
 import (
 	"context"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
-	"time"
 )
 
 type Port interface {
@@ -17,9 +18,6 @@ type Port interface {
 	NewToken(ctx context.Context, uid uuid.UUID, d time.Duration) (string, error)
 	ParseClaims(ctx context.Context, tokenStr string) (Claims, error)
 }
-
-const AccessTokenDuration = time.Minute * 30
-const RefreshTokenDuration = time.Hour * 24 * 7
 
 type Core struct {
 	secret []byte
@@ -36,11 +34,11 @@ func New(conf config.Config) *Core {
 }
 
 func (c *Core) GetAccessTime() time.Time {
-	return time.Now().Add(AccessTokenDuration)
+	return time.Now().Add(config.AccessTokenDuration)
 }
 
 func (c *Core) GetRefreshTime() time.Time {
-	return time.Now().Add(RefreshTokenDuration)
+	return time.Now().Add(config.RefreshTokenDuration)
 }
 
 func (c *Core) GenPair(ctx context.Context, uid uuid.UUID) (string, string, error) {
@@ -48,7 +46,7 @@ func (c *Core) GenPair(ctx context.Context, uid uuid.UUID) (string, string, erro
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
 
-	access, err := c.NewToken(ctx, uid, AccessTokenDuration)
+	access, err := c.NewToken(ctx, uid, config.AccessTokenDuration)
 	if err != nil {
 		zap.L().Error(
 			"Failed to generate token pair",
@@ -59,7 +57,7 @@ func (c *Core) GenPair(ctx context.Context, uid uuid.UUID) (string, string, erro
 		return "", "", err
 	}
 
-	refresh, err := c.NewToken(ctx, uid, RefreshTokenDuration)
+	refresh, err := c.NewToken(ctx, uid, config.RefreshTokenDuration)
 	if err != nil {
 		zap.L().Error(
 			"Failed to generate token pair",
@@ -88,7 +86,6 @@ func (c *Core) NewToken(ctx context.Context, uid uuid.UUID, d time.Duration) (st
 			},
 		},
 	).SignedString(c.secret)
-
 	if err != nil {
 		zap.L().Error(
 			ErrWhileCreatingToken.Error(),
@@ -116,7 +113,6 @@ func (c *Core) ParseClaims(ctx context.Context, tokenStr string) (Claims, error)
 			return c.secret, nil
 		},
 	)
-
 	if err != nil {
 		zap.L().Error(
 			"Failed to parse claims",

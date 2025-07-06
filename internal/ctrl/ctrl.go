@@ -2,10 +2,11 @@ package ctrl
 
 import (
 	"context"
-	"github.com/JMURv/golang-clean-template/internal/auth"
-	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 	"io"
 	"time"
+
+	"github.com/JMURv/golang-clean-template/internal/auth"
+	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 )
 
 type AppRepo interface{}

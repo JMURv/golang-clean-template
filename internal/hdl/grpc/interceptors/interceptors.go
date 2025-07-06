@@ -2,6 +2,8 @@ package interceptors
 
 import (
 	"context"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	metrics "github.com/JMURv/golang-clean-template/internal/observability/metrics/prometheus"
 	"github.com/opentracing/opentracing-go"
@@ -9,7 +11,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"time"
 )
 
 func Auth(au auth.Core) grpc.UnaryServerInterceptor {
