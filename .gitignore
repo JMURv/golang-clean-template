@@ -14,6 +14,13 @@ bin/*
 !.env.example
 !.env.test
 
+# k8s
+cfg.yaml
+!cfg.example.yaml
+
+secret.yaml
+!secret.example.yaml
+
 # observe
 !loki-config.yaml
 !promtail-config.yaml

@@ -21,7 +21,7 @@ services:
       context: ../
       dockerfile: ./build/docker/Dockerfile.dev
     env_file: !override
-      - ./configs/envs/.env
+      - ./configs/envs/.env.dev
     extends:
       file: compose-base.yaml
       service: backend

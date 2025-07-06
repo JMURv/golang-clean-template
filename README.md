@@ -26,10 +26,17 @@ After that, you can run app via `./bin/main`
 ___
 
 ### Docker
-In root folder run:
+In the root folder run:
 ```shell
 task dc-dev-build
 ```
+
+or run:
+```shell
+task dc-prod-build
+```
+
+To build `dev` or `prod` containers respectively
 
 ## Run
 ### Locally
@@ -79,11 +86,11 @@ task k-down
 
 ## Tests
 ### E2E
-Spin up all containers for `E2E` tests:
+Spin up all containers for `integration` tests:
 ```shell
 task dc-test
 ```
 Wait until all containers are ready and then run:
 ```shell
- task t-integ
+task t-integration
 ```

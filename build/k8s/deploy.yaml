@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: image
+          image: hello-world:latest
 
           envFrom:
             - configMapRef:
@@ -49,3 +49,32 @@ spec:
             httpGet:
               path: /health
               port: 8080
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: app
+  labels:
+    app: my-app
+
+spec:
+  selector:
+    app: my-app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
+
+    - name: grpc
+      port: 50050
+      targetPort: 50050
+      nodePort: 30050
+
+    - name: metrics
+      port: 8085
+      targetPort: 8085
+      nodePort: 30085
+  type: NodePort
