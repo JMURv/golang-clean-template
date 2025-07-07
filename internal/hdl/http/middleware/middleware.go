@@ -102,7 +102,10 @@ func Logger(logger *zap.Logger) func(http.Handler) http.Handler {
 func OT(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			span, ctx := opentracing.StartSpanFromContext(r.Context(), fmt.Sprintf("%s %s", r.Method, r.RequestURI))
+			span, ctx := opentracing.StartSpanFromContext(
+				r.Context(),
+				fmt.Sprintf("%s %s", r.Method, r.RequestURI),
+			)
 			defer span.Finish()
 
 			next.ServeHTTP(w, r.WithContext(ctx))

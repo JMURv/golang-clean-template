@@ -76,7 +76,12 @@ func (s *S3) UploadFile(ctx context.Context, req *UploadFileRequest) (string, er
 	uniqueName := fmt.Sprintf("%d-%s", time.Now().UnixNano(), req.Filename)
 
 	_, err := s.cli.PutObject(
-		ctx, s.bucket, uniqueName, bytes.NewReader(req.File), int64(len(req.File)), minio.PutObjectOptions{
+		ctx,
+		s.bucket,
+		uniqueName,
+		bytes.NewReader(req.File),
+		int64(len(req.File)),
+		minio.PutObjectOptions{
 			ContentType:  req.ContentType,
 			UserMetadata: map[string]string{"x-amz-acl": "public-read"},
 		},

@@ -148,7 +148,11 @@ func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileReq
 		}(file)
 
 		if header.Size > 10<<20 {
-			zap.L().Debug("file too large", zap.String("field", fieldName), zap.Int64("size", header.Size))
+			zap.L().Debug(
+				"file too large",
+				zap.String("field", fieldName),
+				zap.Int64("size", header.Size),
+			)
 			return ErrFileTooLarge
 		}
 
@@ -160,7 +164,8 @@ func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileReq
 
 		fileReq.ContentType = http.DetectContentType(fileReq.File)
 		if !strings.HasPrefix(fileReq.ContentType, "image/") {
-			zap.L().Debug("invalid file type", zap.String("field", fieldName), zap.String("type", fileReq.ContentType))
+			zap.L().
+				Debug("invalid file type", zap.String("field", fieldName), zap.String("type", fileReq.ContentType))
 			return ErrInvalidFileType
 		}
 
