@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	Mode        string `env:"MODE" envDefault:"dev"`
+	Mode        string `env:"MODE"         envDefault:"dev"`
 	ServiceName string `env:"SERVICE_NAME" envDefault:"sso"`
 	Server      ServerConfig
 	Auth        authConfig
@@ -21,11 +21,11 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Scheme   string `env:"SERVER_SCHEME" envDefault:"http"`
-	Domain   string `env:"SERVER_DOMAIN" envDefault:"localhost"`
+	Scheme   string `env:"SERVER_SCHEME"             envDefault:"http"`
+	Domain   string `env:"SERVER_DOMAIN"             envDefault:"localhost"`
 	Port     int    `env:"SERVER_HTTP_PORT,required"`
-	GRPCPort int    `env:"SERVER_GRPC_PORT" envDefault:"50050"`
-	PromPort int    `env:"SERVER_PROM_PORT" envDefault:"8085"`
+	GRPCPort int    `env:"SERVER_GRPC_PORT"          envDefault:"50050"`
+	PromPort int    `env:"SERVER_PROM_PORT"          envDefault:"8085"`
 }
 
 type authConfig struct {
@@ -41,26 +41,26 @@ type authConfig struct {
 
 type smtpConfig struct {
 	Server string `env:"EMAIL_SERVER" envDefault:"smtp.gmail.com"`
-	Port   int    `env:"EMAIL_PORT" envDefault:"587"`
-	User   string `env:"EMAIL_USER" envDefault:""`
-	Pass   string `env:"EMAIL_PASS" envDefault:""`
-	Admin  string `env:"EMAIL_ADMIN" envDefault:""`
+	Port   int    `env:"EMAIL_PORT"   envDefault:"587"`
+	User   string `env:"EMAIL_USER"   envDefault:""`
+	Pass   string `env:"EMAIL_PASS"   envDefault:""`
+	Admin  string `env:"EMAIL_ADMIN"  envDefault:""`
 }
 
 type dbConfig struct {
-	Host     string `env:"POSTGRES_HOST" envDefault:"localhost"`
-	Port     int    `env:"POSTGRES_PORT" envDefault:"5432"`
-	User     string `env:"POSTGRES_USER" envDefault:"app_owner"`
+	Host     string `env:"POSTGRES_HOST"     envDefault:"localhost"`
+	Port     int    `env:"POSTGRES_PORT"     envDefault:"5432"`
+	User     string `env:"POSTGRES_USER"     envDefault:"app_owner"`
 	Password string `env:"POSTGRES_PASSWORD" envDefault:"password"`
-	Database string `env:"POSTGRES_DB" envDefault:"app_db"`
+	Database string `env:"POSTGRES_DB"       envDefault:"app_db"`
 }
 
 type s3Config struct {
-	Addr      string `env:"MINIO_ADDR" envDefault:"localhost:9000"`
+	Addr      string `env:"MINIO_ADDR"       envDefault:"localhost:9000"`
 	AccessKey string `env:"MINIO_ACCESS_KEY" envDefault:""`
 	SecretKey string `env:"MINIO_SECRET_KEY" envDefault:""`
-	Bucket    string `env:"MINIO_BUCKET" envDefault:"app"`
-	UseSSL    bool   `env:"MINIO_SSL" envDefault:"false"`
+	Bucket    string `env:"MINIO_BUCKET"     envDefault:"app"`
+	UseSSL    bool   `env:"MINIO_SSL"        envDefault:"false"`
 }
 
 type redisConfig struct {

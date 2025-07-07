@@ -42,6 +42,8 @@ formatters:
     - gofmt
     - gofumpt
     - goimports
+    - golines
+    - swaggo
   settings:
     gofmt:
       rewrite-rules:

@@ -9,9 +9,9 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 )
 
-type AppRepo interface{}
+type AppRepo any
 
-type AppCtrl interface{}
+type AppCtrl any
 
 type S3Service interface {
 	UploadFile(ctx context.Context, req *s3.UploadFileRequest) (string, error)
@@ -25,7 +25,7 @@ type CacheService interface {
 	InvalidateKeysByPattern(ctx context.Context, pattern string)
 }
 
-type EmailService interface{}
+type EmailService any
 
 type Controller struct {
 	au    auth.Core
@@ -35,7 +35,13 @@ type Controller struct {
 	smtp  EmailService
 }
 
-func New(au auth.Core, repo AppRepo, cache CacheService, s3 S3Service, smtp EmailService) *Controller {
+func New(
+	au auth.Core,
+	repo AppRepo,
+	cache CacheService,
+	s3 S3Service,
+	smtp EmailService,
+) *Controller {
 	return &Controller{
 		au:    au,
 		repo:  repo,
