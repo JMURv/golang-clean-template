@@ -1,28 +1,6 @@
 version: 3
 
-vars:
-  DEV_ENV_FILE: "build/configs/envs/.env.dev"
-  DEV_DOCKER_COMPOSE_PATH: "build/compose-dev.yaml"
-
-  PROD_ENV_FILE: "build/configs/envs/.env.prod"
-  PROD_DOCKER_COMPOSE_PATH: "build/compose.yaml"
-
-  TEST_ENV_FILE: "build/configs/envs/.env.test"
-  TEST_DOCKER_COMPOSE_PATH: "build/compose-test.yaml"
-
 tasks:
-  # LOCAL
-  run:
-    desc: Run app
-    cmds:
-      - "go run cmd/main.go"
-
-  build:
-    desc: Build app
-    cmds:
-      - "go build -o bin/main cmd/main.go"
-  # END
-
   # UTILS
   pre:
     desc: Run pre-commit tasks
@@ -59,64 +37,6 @@ tasks:
     cmds:
       - 'mockgen -source="./internal/ctrl/ctrl.go" -destination="tests/mocks/mock_ctrl.go" -package=mocks'
       - 'mockgen -source="./internal/auth/auth.go" -destination="tests/mocks/mock_auth.go" -package=mocks'
-  # END
-
-  # DOCKER
-  dc-prod:
-    desc: Run prod compose
-    cmds:
-      - "docker compose --env-file {{.PROD_ENV_FILE}} -f {{.PROD_DOCKER_COMPOSE_PATH}} up --watch"
-
-  dc-prod-build:
-    desc: Run prod compose
-    cmds:
-      - "docker compose --env-file {{.PROD_ENV_FILE}} -f {{.PROD_DOCKER_COMPOSE_PATH}} up --build --watch"
-
-  dc-prod-down:
-    desc: Shutdown prod compose
-    cmds:
-      - "docker compose --env-file {{.PROD_ENV_FILE}} -f {{.PROD_DOCKER_COMPOSE_PATH}} down"
-
-  dc-dev:
-    desc: Run dev compose
-    cmds:
-      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} up --watch"
-
-  dc-dev-build:
-    desc: Run dev compose
-    cmds:
-      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} up --build --watch"
-
-  dc-dev-down:
-    desc: Shutdown dev compose
-    cmds:
-      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} down"
-
-  dc-test:
-    desc: Run integration tests helper containers
-    cmds:
-      - "docker compose --env-file {{.TEST_ENV_FILE}} -f {{.TEST_DOCKER_COMPOSE_PATH}} up"
-
-  dc-test-down:
-    desc: Shutdown integration tests helper containers
-    cmds:
-      - "docker compose -f {{.TEST_DOCKER_COMPOSE_PATH}} down"
-  # END
-
-  # K8s
-  k-up:
-    desc: Run k8s manifests
-    cmds:
-      - "kubectl apply -f build/k8s/cfg/cfg.yaml"
-      - "kubectl apply -f build/k8s/cfg/secret.yaml"
-      - "kubectl apply -f build/k8s/deploy.yaml"
-
-  k-down:
-    desc: Remove k8s manifests
-    cmds:
-      - "kubectl delete -f build/k8s/cfg/cfg.yaml"
-      - "kubectl delete -f build/k8s/cfg/secret.yaml"
-      - "kubectl delete -f build/k8s/deploy.yaml"
   # END
 
   # TESTS
