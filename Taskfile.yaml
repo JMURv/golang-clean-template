@@ -42,7 +42,7 @@ tasks:
   lint:
     desc: Lint app
     cmds:
-      - "golangci-lint run --fix"
+      - "golangci-lint run"
 
   fmt:
     desc: Format app

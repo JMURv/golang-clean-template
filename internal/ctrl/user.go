@@ -221,15 +221,6 @@ func (c *Controller) UpdateUser(
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
 
-	if req.Password != "" {
-		hash, err := c.au.Hash(req.Password)
-		if err != nil {
-			return err
-		}
-
-		req.Password = hash
-	}
-
 	if len(file.File) > 0 {
 		url, err := c.s3.UploadFile(ctx, file)
 		if err != nil {

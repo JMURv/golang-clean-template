@@ -9,6 +9,7 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	mid "github.com/JMURv/golang-clean-template/internal/hdl/http/middleware"
 	"github.com/JMURv/golang-clean-template/internal/hdl/http/utils"
+	_ "github.com/JMURv/golang-clean-template/internal/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -110,8 +111,8 @@ func (h *Handler) getDevice(w http.ResponseWriter, r *http.Request) {
 //	@Summary		Update a device
 //	@Description	Modify properties of a device owned by the current user
 //	@Tags			Device
-//	@Param			id		path					string	true	"Device UUID"
-//	@Param			body	dto.UpdateDeviceRequest	true	"Update payload"
+//	@Param			id		path	string					true	"Device UUID"
+//	@Param			body	body	dto.UpdateDeviceRequest	true	"Update payload"
 //	@Accept			json
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"Authorization token"

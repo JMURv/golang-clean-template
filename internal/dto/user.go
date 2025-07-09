@@ -14,23 +14,20 @@ type PaginatedUserResponse struct {
 }
 
 type CreateUserRequest struct {
-	Name     string   `json:"name"            validate:"required"`
-	Email    string   `json:"email"           validate:"required,email"`
-	Password string   `json:"password"        validate:"required"`
-	Avatar   string   `json:"avatar"`
-	IsActive bool     `json:"isActive"`
-	IsEmail  bool     `json:"isEmailVerified"`
-	Roles    []uint64 `json:"roles"`
+	Name     string `json:"name"            validate:"required"`
+	Email    string `json:"email"           validate:"required,email"`
+	Password string `json:"password"        validate:"required"`
+	Avatar   string `json:"avatar"`
+	IsActive bool   `json:"isActive"`
+	IsEmail  bool   `json:"isEmailVerified"`
 }
 
 type UpdateUserRequest struct {
-	Name     string   `json:"name"            validate:"required"`
-	Email    string   `json:"email"           validate:"required,email"`
-	Password string   `json:"password"`
-	Avatar   string   `json:"avatar"`
-	IsActive bool     `json:"isActive"`
-	IsEmail  bool     `json:"isEmailVerified"`
-	Roles    []uint64 `json:"roles"`
+	Name     string `json:"name"            validate:"required"`
+	Email    string `json:"email"           validate:"required,email"`
+	Avatar   string `json:"avatar"`
+	IsActive bool   `json:"isActive"`
+	IsEmail  bool   `json:"isEmailVerified"`
 }
 
 type CreateUserResponse struct {

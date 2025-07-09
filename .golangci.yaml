@@ -17,6 +17,7 @@ linters:
     - gosec
     - funlen
     - exhaustruct
+    - dupword
   settings:
     wsl_v5:
       allow-first-in-block: true

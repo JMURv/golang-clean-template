@@ -26,7 +26,6 @@ func (r *Repository) ListUsers(
 	defer span.Finish()
 
 	var count int64
-
 	err := r.conn.QueryRowContext(ctx, userSelectQ).Scan(&count)
 	if err != nil {
 		zap.L().Error("failed to count users", zap.String("op", op), zap.Error(err))
@@ -296,23 +295,16 @@ func (r *Repository) UpdateUser(
 		}
 	}()
 
-	var res sql.Result
-	if req.Password != "" {
-		res, err = tx.ExecContext(
-			ctx,
-			userUpdateWithPassQ,
-			req.Name,
-			req.Email,
-			req.Password,
-			req.Avatar,
-			req.IsActive,
-			req.IsEmail,
-			id,
-		)
-	} else {
-		res, err = tx.ExecContext(ctx, userUpdateQ, req.Name, req.Email, req.Avatar, req.IsActive, req.IsEmail, id)
-	}
-
+	res, err := tx.ExecContext(
+		ctx,
+		userUpdateQ,
+		req.Name,
+		req.Email,
+		req.Avatar,
+		req.IsActive,
+		req.IsEmail,
+		id,
+	)
 	if err != nil {
 		zap.L().Error(
 			"failed to update user",

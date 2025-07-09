@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -98,13 +99,13 @@ func ParseAndValidate(w http.ResponseWriter, r *http.Request, dst any) bool {
 	return true
 }
 
-func ParseDeviceByRequest(r *http.Request) (dto.DeviceRequest, bool) {
-	ip, ok := r.Context().Value("ip").(string)
+func ParseDeviceByRequest(ctx context.Context) (dto.DeviceRequest, bool) {
+	ip, ok := ctx.Value("ip").(string)
 	if !ok {
 		return dto.DeviceRequest{}, false
 	}
 
-	ua, ok := r.Context().Value("ua").(string)
+	ua, ok := ctx.Value("ua").(string)
 	if !ok {
 		return dto.DeviceRequest{}, false
 	}

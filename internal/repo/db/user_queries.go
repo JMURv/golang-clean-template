@@ -65,16 +65,6 @@ SET name = $1,
 	is_email_verified = $5
 WHERE id = $6`
 
-const userUpdateWithPassQ = `
-UPDATE users 
-SET name = $1, 
-    email = $2,
-	password = $3,
-    avatar = $4,
-	is_active = $5,
-	is_email_verified = $6
-WHERE id = $7`
-
 const userDeleteQ = `
 DELETE FROM users 
 WHERE id = $1

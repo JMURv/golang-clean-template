@@ -10,6 +10,7 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	mid "github.com/JMURv/golang-clean-template/internal/hdl/http/middleware"
 	"github.com/JMURv/golang-clean-template/internal/hdl/http/utils"
+	_ "github.com/JMURv/golang-clean-template/internal/models"
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
@@ -35,10 +36,10 @@ func (h *Handler) RegisterUserRoutes() {
 //	@Tags			User
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	dto.CheckEmailRequest	true	"Email payload"
-//	@Success		200		{object}				dto.ExistsUserResponse
-//	@Failure		404		{object}				utils.ErrorsResponse	"user not found"
-//	@Failure		500		{object}				utils.ErrorsResponse	"internal error"
+//	@Param			body	body		dto.CheckEmailRequest	true	"Email payload"
+//	@Success		200		{object}	dto.ExistsUserResponse
+//	@Failure		404		{object}	utils.ErrorsResponse	"user not found"
+//	@Failure		500		{object}	utils.ErrorsResponse	"internal error"
 //	@Router			/users/exists [post]
 func (h *Handler) existsUser(w http.ResponseWriter, r *http.Request) {
 	req := &dto.CheckEmailRequest{}

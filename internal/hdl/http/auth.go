@@ -29,17 +29,17 @@ func (h *Handler) RegisterAuthRoutes() {
 //	@Tags			Authentication
 //	@Accept			json
 //	@Produce		json
-//	@Param			X-Real-IP	header						string	true	"Client real IP address"
-//	@Param			User-Agent	header						string	true	"Client User-Agent"
-//	@Param			body		dto.EmailAndPasswordRequest	true	"email, password, reCAPTCHA token"
-//	@Success		200			{object}					dto.TokenPair
-//	@Failure		400			{object}					utils.ErrorsResponse	"missing device info or bad payload"
-//	@Failure		401			{object}					utils.ErrorsResponse	"invalid credentials or reCAPTCHA"
-//	@Failure		404			{object}					utils.ErrorsResponse	"user not found"
-//	@Failure		500			{object}					utils.ErrorsResponse	"internal error"
+//	@Param			X-Real-IP	header	string						true	"Client real IP address"
+//	@Param			User-Agent	header	string						true	"Client User-Agent"
+//	@Param			body		body	dto.EmailAndPasswordRequest	true	"Login credentials"
+//	@Success		200			"Successfully authenticated (sets cookies)"
+//	@Failure		400			{object}	utils.ErrorsResponse
+//	@Failure		401			{object}	utils.ErrorsResponse
+//	@Failure		404			{object}	utils.ErrorsResponse
+//	@Failure		500			{object}	utils.ErrorsResponse
 //	@Router			/auth/jwt [post]
 func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request) {
-	d, ok := utils.ParseDeviceByRequest(r)
+	d, ok := utils.ParseDeviceByRequest(r.Context())
 	if !ok {
 		utils.ErrResponse(w, http.StatusBadRequest, ErrNoDeviceInfo)
 		return
@@ -47,12 +47,13 @@ func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request) {
 
 	req := &dto.EmailAndPasswordRequest{}
 	if ok = utils.ParseAndValidate(w, r, req); !ok {
+		utils.ErrResponse(w, http.StatusBadRequest, hdl.ErrDecodeRequest)
 		return
 	}
 
 	valid, err := h.au.VerifyRecaptcha(req.Token, captcha.PassAuth)
 	if err != nil {
-		utils.ErrResponse(w, http.StatusInternalServerError, captcha.ErrVerificationFailed)
+		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
 	}
 
@@ -84,21 +85,20 @@ func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request) {
 // refresh godoc
 //
 //	@Summary		Refresh JWT tokens
-//	@Description	Validate device header and refresh tokens, reset cookies
+//	@Description	Validate refresh token from cookie and issue new tokens
 //	@Tags			Authentication
 //	@Accept			json
 //	@Produce		json
-//	@Param			X-Real-IP	header				string	true	"Client real IP address"
-//	@Param			User-Agent	header				string	true	"Client User-Agent"
-//	@Param			body		dto.RefreshRequest	true	"refresh_token"
-//	@Success		200			{object}			dto.TokenPair
-//	@Failure		400			{object}			utils.ErrorsResponse	"missing device info or bad payload"
-//	@Failure		401			{object}			utils.ErrorsResponse	"token revoked or invalid"
-//	@Failure		404			{object}			utils.ErrorsResponse	"session not found"
-//	@Failure		500			{object}			utils.ErrorsResponse	"internal error"
+//	@Param			X-Real-IP	header	string	true	"Client real IP address"
+//	@Param			User-Agent	header	string	true	"Client User-Agent"
+//	@Success		200			"Successfully refreshed tokens (sets cookies)"
+//	@Failure		400			{object}	utils.ErrorsResponse
+//	@Failure		401			{object}	utils.ErrorsResponse
+//	@Failure		404			{object}	utils.ErrorsResponse
+//	@Failure		500			{object}	utils.ErrorsResponse
 //	@Router			/auth/jwt/refresh [post]
 func (h *Handler) refresh(w http.ResponseWriter, r *http.Request) {
-	d, ok := utils.ParseDeviceByRequest(r)
+	d, ok := utils.ParseDeviceByRequest(r.Context())
 	if !ok {
 		utils.ErrResponse(w, http.StatusBadRequest, ErrNoDeviceInfo)
 		return
@@ -138,8 +138,8 @@ func (h *Handler) refresh(w http.ResponseWriter, r *http.Request) {
 //	@Description	Revoke refresh token, clear JWT cookies
 //	@Tags			Authentication
 //	@Produce		json
-//	@Param			Authorization	header		string					true	"Authorization token"
-//	@Success		200				{object}	nil						"OK"
+//	@Param			Authorization	header	string	true	"Authorization token"
+//	@Success		200				"Revoked refresh token, cleared cookies"
 //	@Failure		404				{object}	utils.ErrorsResponse	"session not found"
 //	@Failure		500				{object}	utils.ErrorsResponse	"internal error"
 //	@Router			/auth/logout [post]
