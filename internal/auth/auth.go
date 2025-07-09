@@ -39,10 +39,8 @@ func (a *Auth) Hash(val string) (string, error) {
 			zap.String("val", val),
 			zap.Error(err),
 		)
-
 		return "", err
 	}
-
 	return string(bytes), nil
 }
 

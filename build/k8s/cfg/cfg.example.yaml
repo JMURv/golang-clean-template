@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-cfg
+  name: app-template-cfg
 data:
   # APP
   MODE: "prod"
-  SERVICE_NAME: "app"
+  SERVICE_NAME: "app-template"
   SERVER_SCHEME: "http"
   SERVER_DOMAIN: "localhost"
 
@@ -20,7 +20,7 @@ data:
   POSTGRES_PORT: "5432"
 
   # SECRETS
-  JWT_ISSUER: "APP"
+  JWT_ISSUER: "APP-TEMPLATE"
 
   # CAPTCHA
   CAPTCHA_SITE_KEY: ""
@@ -33,7 +33,7 @@ data:
 
   # MINIO
   MINIO_ADDR: "localhost:9000"
-  MINIO_BUCKET: "app"
+  MINIO_BUCKET: "app-template"
   MINIO_SSL: "false"
 
   # REDIS

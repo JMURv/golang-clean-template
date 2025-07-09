@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/config"
+	"github.com/JMURv/golang-clean-template/internal/dto"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	"github.com/JMURv/golang-clean-template/internal/hdl/validation"
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
@@ -34,7 +35,6 @@ func SuccessResponse(w http.ResponseWriter, statusCode int, data any) {
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		zap.L().Error("failed to encode success response", zap.Error(err))
-
 		return
 	}
 }
@@ -98,7 +98,24 @@ func ParseAndValidate(w http.ResponseWriter, r *http.Request, dst any) bool {
 	return true
 }
 
-func GetAuthCookies(accessStr string, refreshStr string) (*http.Cookie, *http.Cookie) {
+func ParseDeviceByRequest(r *http.Request) (dto.DeviceRequest, bool) {
+	ip, ok := r.Context().Value("ip").(string)
+	if !ok {
+		return dto.DeviceRequest{}, false
+	}
+
+	ua, ok := r.Context().Value("ua").(string)
+	if !ok {
+		return dto.DeviceRequest{}, false
+	}
+
+	return dto.DeviceRequest{
+		IP: ip,
+		UA: ua,
+	}, true
+}
+
+func GetAuthCookies(accessStr, refreshStr string) (*http.Cookie, *http.Cookie) {
 	access := &http.Cookie{
 		Name:     config.AccessCookieName,
 		Value:    accessStr,
@@ -147,7 +164,7 @@ func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileReq
 			}
 		}(file)
 
-		if header.Size > 10<<20 {
+		if header.Size > config.MaxMemory {
 			zap.L().Debug(
 				"file too large",
 				zap.String("field", fieldName),

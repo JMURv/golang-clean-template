@@ -9,9 +9,17 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 )
 
-type AppRepo any
+type AppRepo interface {
+	authRepo
+	deviceRepo
+	userRepo
+}
 
-type AppCtrl any
+type AppCtrl interface {
+	authCtrl
+	deviceCtrl
+	userCtrl
+}
 
 type S3Service interface {
 	UploadFile(ctx context.Context, req *s3.UploadFileRequest) (string, error)

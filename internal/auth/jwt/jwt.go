@@ -53,7 +53,6 @@ func (c *Core) GenPair(ctx context.Context, uid uuid.UUID) (string, string, erro
 			zap.String("uid", uid.String()),
 			zap.Error(err),
 		)
-
 		return "", "", err
 	}
 
@@ -64,7 +63,6 @@ func (c *Core) GenPair(ctx context.Context, uid uuid.UUID) (string, string, erro
 			zap.String("uid", uid.String()),
 			zap.Error(err),
 		)
-
 		return "", "", err
 	}
 
@@ -91,7 +89,6 @@ func (c *Core) NewToken(ctx context.Context, uid uuid.UUID, d time.Duration) (st
 			ErrWhileCreatingToken.Error(),
 			zap.Error(err),
 		)
-
 		return "", ErrWhileCreatingToken
 	}
 
@@ -109,7 +106,6 @@ func (c *Core) ParseClaims(ctx context.Context, tokenStr string) (Claims, error)
 			if token.Method.Alg() != jwt.SigningMethodHS256.Alg() {
 				return nil, ErrUnexpectedSignMethod
 			}
-
 			return c.secret, nil
 		},
 	)
@@ -120,7 +116,6 @@ func (c *Core) ParseClaims(ctx context.Context, tokenStr string) (Claims, error)
 			zap.Any("token", tokenStr),
 			zap.Error(err),
 		)
-
 		return claims, err
 	}
 
@@ -130,7 +125,6 @@ func (c *Core) ParseClaims(ctx context.Context, tokenStr string) (Claims, error)
 			zap.String("op", op),
 			zap.String("token", tokenStr),
 		)
-
 		return claims, ErrInvalidToken
 	}
 

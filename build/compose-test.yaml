@@ -1,4 +1,4 @@
-name: app
+name: app-template
 services:
   redis:
     extends:
@@ -18,5 +18,5 @@ services:
       service: backend
 
 networks:
-  app:
-    name: app
+  app-template:
+    name: app-template

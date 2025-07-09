@@ -21,6 +21,8 @@ const (
 	PassAuth Actions = "pass_auth"
 )
 
+const captchaScore = 0.1
+
 type Core struct {
 	secret string
 }
@@ -41,7 +43,6 @@ func (c *Core) VerifyRecaptcha(token string, action Actions) (bool, error) {
 	)
 	if err != nil {
 		zap.L().Error("failed to verify recaptcha", zap.Error(err))
-
 		return false, err
 	}
 	defer func(Body io.ReadCloser) {
@@ -53,16 +54,14 @@ func (c *Core) VerifyRecaptcha(token string, action Actions) (bool, error) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		zap.L().Error("failed to read body", zap.Error(err))
-
 		return false, err
 	}
 
 	var result dto.RecaptchaResponse
 	if err = json.Unmarshal(body, &result); err != nil {
 		zap.L().Error("failed to unmarshal body", zap.Error(err))
-
 		return false, err
 	}
 
-	return result.Success && result.Score > 0.5 && result.Action == string(action), nil
+	return result.Success && result.Score > captchaScore && result.Action == string(action), nil
 }

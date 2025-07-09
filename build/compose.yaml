@@ -1,4 +1,4 @@
-name: app
+name: app-template
 services:
   redis:
     extends:
@@ -26,5 +26,5 @@ volumes:
   redis_data:
 
 networks:
-  app:
-    name: app
+  app-template:
+    name: app-template

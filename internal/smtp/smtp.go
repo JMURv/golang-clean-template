@@ -26,7 +26,7 @@ func New(conf config.Config) *EmailServer {
 	}
 }
 
-func (s *EmailServer) GetMessageBase(subject string, toEmail string) *gomail.Message {
+func (s *EmailServer) GetMessageBase(subject, toEmail string) *gomail.Message {
 	m := gomail.NewMessage()
 	m.SetHeader("From", s.user)
 	m.SetHeader("To", toEmail)

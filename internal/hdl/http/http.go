@@ -45,7 +45,9 @@ func (h *Handler) Start(port int) {
 		mid.OT,
 	)
 
-	h.RegisterRoutes()
+	h.RegisterAuthRoutes()
+	h.RegisterUserRoutes()
+	h.RegisterDeviceRoutes()
 	h.router.Get("/swagger/*", httpSwagger.WrapHandler)
 	h.router.Get(
 		"/health", func(w http.ResponseWriter, r *http.Request) {

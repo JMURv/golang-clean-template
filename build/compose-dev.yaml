@@ -1,4 +1,4 @@
-name: app
+name: app-template
 services:
   redis:
     extends:
@@ -16,7 +16,7 @@ services:
       service: minio
 
   backend:
-    image: jmurv/app-backend:latest-dev
+    image: app-template-backend:latest-dev
     build:
       context: ../
       dockerfile: ./build/docker/Dockerfile.dev
@@ -40,5 +40,5 @@ volumes:
   redis_data:
 
 networks:
-  app:
-    name: app
+  app-template:
+    name: app-template

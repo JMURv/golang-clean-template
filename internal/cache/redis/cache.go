@@ -72,6 +72,7 @@ func (c *Cache) GetToStruct(ctx context.Context, key string, dest any) error {
 	}
 
 	zap.L().Info("[CACHE] --> HIT", zap.String("key", key))
+
 	return nil
 }
 

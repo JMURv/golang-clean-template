@@ -1,4 +1,4 @@
-name: app
+name: app-template
 services:
   redis:
     container_name: redis
@@ -8,7 +8,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    networks: [app]
+    networks: [app-template]
 
   db:
     container_name: db
@@ -30,7 +30,7 @@ services:
       start_period: 2s
     volumes:
       - pg_data:/var/lib/postgresql/data
-    networks: [app]
+    networks: [app-template]
 
   minio:
     image: minio/minio:latest
@@ -50,12 +50,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 3
-    networks: [app]
+    networks: [app-template]
 
   backend:
     container_name: backend
     restart: unless-stopped
-    image: jmurv/app-backend:latest
+    image: app-template-backend:latest
     build:
       context: ../
       dockerfile: ./build/docker/Dockerfile
@@ -76,7 +76,7 @@ services:
         restart: true
       redis:
         condition: service_started
-    networks: [app]
+    networks: [app-template]
     develop:
       watch:
         - action: rebuild
@@ -94,7 +94,7 @@ services:
       - "14268:14268"
       - "16686:16686"
       - "6831:6831/udp"
-    networks: [ app ]
+    networks: [ app-template ]
 
   prometheus:
     container_name: prometheus
@@ -105,7 +105,7 @@ services:
     volumes:
       - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
-    networks: [ app ]
+    networks: [ app-template ]
 
   node-exp:
     container_name: node-exp
@@ -113,7 +113,7 @@ services:
     restart: unless-stopped
     ports:
       - "9100:9100"
-    networks: [ app ]
+    networks: [ app-template ]
 
   grafana:
     container_name: grafana
@@ -126,7 +126,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
-    networks: [ app ]
+    networks: [ app-template ]
 
   loki:
     container_name: loki
@@ -138,7 +138,7 @@ services:
     volumes:
       - loki_data:/loki
       - ./configs/loki:/etc/loki
-    networks: [ app ]
+    networks: [ app-template ]
 
   promtail:
     container_name: promtail
@@ -151,7 +151,7 @@ services:
     command: -config.file=/etc/promtail/promtail-config.yaml
     depends_on:
       - loki
-    networks: [ app ]
+    networks: [ app-template ]
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter
@@ -162,7 +162,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks: [ app ]
+    networks: [ app-template ]
 
   redis-exporter:
     image: oliver006/redis_exporter:v1.43.0
@@ -173,7 +173,7 @@ services:
     depends_on:
       redis:
         condition: service_started
-    networks: [ app ]
+    networks: [ app-template ]
 
 volumes:
   pg_data:
@@ -184,5 +184,5 @@ volumes:
   loki_data:
 
 networks:
-  app:
-    name: app
+  app-template:
+    name: app-template

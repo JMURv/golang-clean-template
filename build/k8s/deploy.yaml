@@ -2,29 +2,29 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: app
+  name: app-template
   labels:
-    app: my-app
+    app: app-template
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-app
+      app: app-template
   template:
     metadata:
       labels:
-        app: my-app
+        app: app-template
     spec:
       containers:
         - name: app
-          image: hello-world:latest
+          image: app-template-backend:latest
 
           envFrom:
             - configMapRef:
-                name: app-cfg
+                name: app-template-cfg
             - secretRef:
-                name: app-secret
+                name: app-template-secret
 
           ports:
             - name: http
@@ -55,13 +55,13 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: app
+  name: app-template
   labels:
-    app: my-app
+    app: app-template
 
 spec:
   selector:
-    app: my-app
+    app: app-template
   ports:
     - name: http
       port: 8080
