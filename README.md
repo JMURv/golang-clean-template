@@ -91,6 +91,13 @@ Services are available at:
 ___
 
 ### K8s
+
+- Create your own `configMap` and `secretMap` based on examples:
+```shell
+cp build/k8s/cfg/cfg.example.yaml build/k8s/cfg/cfg.yaml && \
+cp build/k8s/cfg/secret.example.yaml build/k8s/cfg/secret.yaml 
+```
+
 Apply manifests:
 ```shell
 task k-up
@@ -102,7 +109,7 @@ task k-down
 ```
 
 ## Tests
-### E2E
+### Integration
 Spin up all containers for `integration` tests:
 ```shell
 task dc-test
