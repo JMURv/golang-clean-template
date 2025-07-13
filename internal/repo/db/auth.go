@@ -26,6 +26,7 @@ func (r *Repository) CreateToken(
 
 	tx, err := r.conn.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
+		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to begin transaction",
 			zap.String("op", op),
@@ -37,6 +38,7 @@ func (r *Repository) CreateToken(
 
 	defer func() {
 		if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+			span.SetTag("error", true)
 			zap.L().Error(
 				"error while transaction rollback",
 				zap.String("op", op),
@@ -58,6 +60,7 @@ func (r *Repository) CreateToken(
 		device.IP,
 	)
 	if err != nil {
+		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to create user device",
 			zap.String("op", op),
@@ -72,6 +75,7 @@ func (r *Repository) CreateToken(
 		userID, hashedT, expiresAt, device.ID,
 	)
 	if err != nil {
+		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to create refresh token",
 			zap.String("op", op),
@@ -82,6 +86,7 @@ func (r *Repository) CreateToken(
 	}
 
 	if err = tx.Commit(); err != nil {
+		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to commit transaction",
 			zap.String("op", op),
@@ -120,6 +125,7 @@ func (r *Repository) IsTokenValid(
 			return false, nil
 		}
 
+		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to validate token",
 			zap.String("op", op),
@@ -142,6 +148,7 @@ func (r *Repository) RevokeAllTokens(ctx context.Context, userID uuid.UUID) erro
 
 	_, err := r.conn.ExecContext(ctx, revokeToken, userID)
 	if err != nil {
+		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to revoke tokens",
 			zap.String("op", op),
@@ -169,6 +176,7 @@ func (r *Repository) GetByDevice(
 
 	err := r.conn.GetContext(ctx, &token, getTokenByDevice, userID, deviceID)
 	if err != nil {
+		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to get token by device",
 			zap.String("op", op),
@@ -191,6 +199,7 @@ func (r *Repository) RevokeByDevice(ctx context.Context, userID uuid.UUID, devic
 
 	_, err := r.conn.ExecContext(ctx, revokeTokenByDevice, userID, deviceID)
 	if err != nil {
+		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to revoke token by device",
 			zap.String("op", op),

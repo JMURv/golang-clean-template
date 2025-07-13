@@ -601,17 +601,17 @@ func (m *MockCacheService) EXPECT() *MockCacheServiceMockRecorder {
 }
 
 // Close mocks base method.
-func (m *MockCacheService) Close() error {
+func (m *MockCacheService) Close(ctx context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Close")
+	ret := m.ctrl.Call(m, "Close", ctx)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockCacheServiceMockRecorder) Close() *gomock.Call {
+func (mr *MockCacheServiceMockRecorder) Close(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockCacheService)(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockCacheService)(nil).Close), ctx)
 }
 
 // Delete mocks base method.

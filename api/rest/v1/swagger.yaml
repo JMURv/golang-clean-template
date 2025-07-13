@@ -440,11 +440,6 @@ paths:
         name: id
         required: true
         type: string
-      - description: Bearer token, e.g. 'Bearer {jwt}'
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -516,11 +511,6 @@ paths:
         in: formData
         name: avatar
         type: file
-      - description: Bearer token, e.g. 'Bearer {jwt}'
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -578,12 +568,6 @@ paths:
   /users/me:
     get:
       description: Returns the authenticated user's profile
-      parameters:
-      - description: Bearer token, e.g. 'Bearer {jwt}'
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:

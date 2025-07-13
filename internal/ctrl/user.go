@@ -69,9 +69,10 @@ func (c *Controller) IsUserExist(
 	res := &dto.ExistsUserResponse{Exists: false}
 
 	_, err := c.repo.GetUserByEmail(ctx, email)
-	if err != nil && errors.Is(err, repo.ErrNotFound) {
-		return res, nil
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, repo.ErrNotFound) {
+			return res, nil
+		}
 		return nil, err
 	}
 
@@ -91,9 +92,7 @@ func (c *Controller) ListUsers(
 	defer span.Finish()
 
 	cached := &dto.PaginatedUserResponse{}
-
 	cacheKey := fmt.Sprintf(usersListKey, page, size, filters)
-
 	if err := c.cache.GetToStruct(ctx, cacheKey, &cached); err == nil {
 		return cached, nil
 	}
@@ -113,23 +112,21 @@ func (c *Controller) ListUsers(
 
 func (c *Controller) GetUserByID(ctx context.Context, userID uuid.UUID) (*md.User, error) {
 	const op = "users.GetUserByID.ctrl"
-
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
 
 	cached := &md.User{}
-
 	cacheKey := fmt.Sprintf(userCacheKey, userID)
-
 	err := c.cache.GetToStruct(ctx, cacheKey, cached)
 	if err == nil {
 		return cached, nil
 	}
 
 	res, err := c.repo.GetUserByID(ctx, userID)
-	if err != nil && errors.Is(err, repo.ErrNotFound) {
-		return nil, ErrNotFound
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, repo.ErrNotFound) {
+			return nil, ErrNotFound
+		}
 		return nil, err
 	}
 
@@ -156,9 +153,10 @@ func (c *Controller) GetUserByEmail(ctx context.Context, email string) (*md.User
 	}
 
 	res, err := c.repo.GetUserByEmail(ctx, email)
-	if err != nil && errors.Is(err, repo.ErrNotFound) {
-		return nil, ErrNotFound
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, repo.ErrNotFound) {
+			return nil, ErrNotFound
+		}
 		return nil, err
 	}
 
@@ -176,18 +174,17 @@ func (c *Controller) CreateUser(
 	file *s3.UploadFileRequest,
 ) (*dto.CreateUserResponse, error) {
 	const op = "users.CreateUser.ctrl"
-
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
 
-	hash, err := c.au.Hash(u.Password)
+	var err error
+
+	u.Password, err = c.au.Hash(u.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	u.Password = hash
-
-	if len(file.File) > 0 {
+	if file != nil && len(file.File) > 0 {
 		url, err := c.s3.UploadFile(ctx, file)
 		if err != nil {
 			return nil, err
@@ -197,9 +194,10 @@ func (c *Controller) CreateUser(
 	}
 
 	id, err := c.repo.CreateUser(ctx, u)
-	if err != nil && errors.Is(err, repo.ErrAlreadyExists) {
-		return nil, ErrAlreadyExists
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, repo.ErrAlreadyExists) {
+			return nil, ErrAlreadyExists
+		}
 		return nil, err
 	}
 
@@ -221,7 +219,7 @@ func (c *Controller) UpdateUser(
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
 
-	if len(file.File) > 0 {
+	if file != nil && len(file.File) > 0 {
 		url, err := c.s3.UploadFile(ctx, file)
 		if err != nil {
 			return err
@@ -231,9 +229,10 @@ func (c *Controller) UpdateUser(
 	}
 
 	err := c.repo.UpdateUser(ctx, id, req)
-	if err != nil && errors.Is(err, repo.ErrNotFound) {
-		return ErrNotFound
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, repo.ErrNotFound) {
+			return ErrNotFound
+		}
 		return err
 	}
 
@@ -251,9 +250,10 @@ func (c *Controller) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 	defer span.Finish()
 
 	err := c.repo.DeleteUser(ctx, userID)
-	if err != nil && errors.Is(err, repo.ErrNotFound) {
-		return ErrNotFound
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, repo.ErrNotFound) {
+			return ErrNotFound
+		}
 		return err
 	}
 

@@ -89,10 +89,10 @@ func (h *Handler) listUsers(w http.ResponseWriter, r *http.Request) {
 //	@Description	Returns the authenticated user's profile
 //	@Tags			User
 //	@Produce		json
-//	@Success		200				{object}	models.User
-//	@Failure		401				{object}	utils.ErrorsResponse	"unauthorized"
-//	@Failure		404				{object}	utils.ErrorsResponse	"user not found"
-//	@Failure		500				{object}	utils.ErrorsResponse	"internal error"
+//	@Success		200	{object}	models.User
+//	@Failure		401	{object}	utils.ErrorsResponse	"unauthorized"
+//	@Failure		404	{object}	utils.ErrorsResponse	"user not found"
+//	@Failure		500	{object}	utils.ErrorsResponse	"internal error"
 //	@Router			/users/me [get]
 func (h *Handler) getMe(w http.ResponseWriter, r *http.Request) {
 	uid, ok := r.Context().Value("uid").(uuid.UUID)
@@ -219,14 +219,14 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request) {
 //	@Tags			User
 //	@Accept			multipart/form-data
 //	@Produce		json
-//	@Param			id				path		string					true	"User UUID"
-//	@Param			data			formData	string					true	"JSON payload in 'data' field"
-//	@Param			avatar			formData	file					false	"Avatar image file"
-//	@Success		200				{object}	nil						"OK"
-//	@Failure		400				{object}	utils.ErrorsResponse	"bad request"
-//	@Failure		401				{object}	utils.ErrorsResponse	"unauthorized"
-//	@Failure		404				{object}	utils.ErrorsResponse	"user not found"
-//	@Failure		500				{object}	utils.ErrorsResponse	"internal error"
+//	@Param			id		path		string					true	"User UUID"
+//	@Param			data	formData	string					true	"JSON payload in 'data' field"
+//	@Param			avatar	formData	file					false	"Avatar image file"
+//	@Success		200		{object}	nil						"OK"
+//	@Failure		400		{object}	utils.ErrorsResponse	"bad request"
+//	@Failure		401		{object}	utils.ErrorsResponse	"unauthorized"
+//	@Failure		404		{object}	utils.ErrorsResponse	"user not found"
+//	@Failure		500		{object}	utils.ErrorsResponse	"internal error"
 //	@Router			/users/{id} [put]
 func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	uid, err := uuid.Parse(chi.URLParam(r, "id"))
@@ -287,11 +287,11 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 //	@Tags			User
 //	@Accept			json
 //	@Produce		json
-//	@Param			id				path		string					true	"User UUID"
-//	@Success		204				{object}	nil						"No Content"
-//	@Failure		401				{object}	utils.ErrorsResponse	"unauthorized"
-//	@Failure		404				{object}	utils.ErrorsResponse	"user not found"
-//	@Failure		500				{object}	utils.ErrorsResponse	"internal error"
+//	@Param			id	path		string					true	"User UUID"
+//	@Success		204	{object}	nil						"No Content"
+//	@Failure		401	{object}	utils.ErrorsResponse	"unauthorized"
+//	@Failure		404	{object}	utils.ErrorsResponse	"user not found"
+//	@Failure		500	{object}	utils.ErrorsResponse	"internal error"
 //	@Router			/users/{id} [delete]
 func (h *Handler) deleteUser(w http.ResponseWriter, r *http.Request) {
 	uid, err := uuid.Parse(chi.URLParam(r, "id"))

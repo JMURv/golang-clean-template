@@ -551,15 +551,6 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Retrieve current user profile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer token, e.g. 'Bearer {jwt}'",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -669,13 +660,6 @@ const docTemplate = `{
                         "description": "Avatar image file",
                         "name": "avatar",
                         "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Bearer token, e.g. 'Bearer {jwt}'",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -726,13 +710,6 @@ const docTemplate = `{
                         "description": "User UUID",
                         "name": "id",
                         "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Bearer token, e.g. 'Bearer {jwt}'",
-                        "name": "Authorization",
-                        "in": "header",
                         "required": true
                     }
                 ],
