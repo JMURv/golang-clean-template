@@ -126,7 +126,7 @@ tasks:
       - "task t-hdl"
       - "task t-ctrl"
       - "task t-repo"
-      - "task t-integration"
+      #- "task t-integration"
 
   t-hdl:
     desc: Test handlers

@@ -2,7 +2,7 @@ package db
 
 const listDevices = `
 SELECT id, name, device_type, os, user_agent, browser, ip, last_active 
-FROM user_devices 
+FROM devices 
 WHERE user_id = $1
 `
 
@@ -18,7 +18,7 @@ SELECT
 	ip,
 	last_active,
 	created_at
-FROM user_devices
+FROM devices
 WHERE id = $1 AND user_id = $2
 `
 
@@ -34,17 +34,17 @@ SELECT
 	ip,
 	last_active,
 	created_at
-FROM user_devices
+FROM devices
 WHERE id = $1
 `
 
 const updateDevice = `
-UPDATE user_devices
+UPDATE devices
 SET name = $1
 WHERE id = $2 AND user_id = $3
 `
 
 const deleteDevice = `
-DELETE FROM user_devices
+DELETE FROM devices
 WHERE id = $1 AND user_id = $2
 `

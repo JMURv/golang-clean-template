@@ -15,7 +15,7 @@ import (
 )
 
 func (r *Repository) ListDevices(ctx context.Context, uid uuid.UUID) ([]md.Device, error) {
-	const op = "auth.ListDevices.repo"
+	const op = "devices.ListDevices.repo"
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
@@ -39,7 +39,7 @@ func (r *Repository) ListDevices(ctx context.Context, uid uuid.UUID) ([]md.Devic
 }
 
 func (r *Repository) GetDevice(ctx context.Context, uid uuid.UUID, dID string) (*md.Device, error) {
-	const op = "auth.GetDevice.repo"
+	const op = "devices.GetDevice.repo"
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
@@ -73,7 +73,7 @@ func (r *Repository) GetDevice(ctx context.Context, uid uuid.UUID, dID string) (
 }
 
 func (r *Repository) GetDeviceByID(ctx context.Context, dID string) (*md.Device, error) {
-	const op = "auth.GetDevice.repo"
+	const op = "devices.GetDevice.repo"
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
@@ -110,7 +110,7 @@ func (r *Repository) UpdateDevice(
 	dID string,
 	req *dto.UpdateDeviceRequest,
 ) error {
-	const op = "auth.UpdateDevice.repo"
+	const op = "devices.UpdateDevice.repo"
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
@@ -157,7 +157,7 @@ func (r *Repository) UpdateDevice(
 }
 
 func (r *Repository) DeleteDevice(ctx context.Context, userID uuid.UUID, deviceID string) error {
-	const op = "auth.DeleteDevice.repo"
+	const op = "devices.DeleteDevice.repo"
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()

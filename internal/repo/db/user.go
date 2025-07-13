@@ -127,15 +127,17 @@ func (r *Repository) GetUserByID(ctx context.Context, userID uuid.UUID) (*md.Use
 		&res.CreatedAt,
 		&res.UpdatedAt,
 	)
-	if errors.Is(err, sql.ErrNoRows) {
-		zap.L().Debug(
-			"no user found",
-			zap.String("op", op),
-			zap.String("userID", userID.String()),
-		)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			zap.L().Debug(
+				"no user found",
+				zap.String("op", op),
+				zap.String("userID", userID.String()),
+			)
 
-		return nil, repo.ErrNotFound
-	} else if err != nil {
+			return nil, repo.ErrNotFound
+		}
+
 		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to get user",
@@ -170,15 +172,17 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*md.User
 			&res.CreatedAt,
 			&res.UpdatedAt,
 		)
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		zap.L().Debug(
-			"no user found",
-			zap.String("op", op),
-			zap.String("email", email),
-		)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			zap.L().Debug(
+				"no user found",
+				zap.String("op", op),
+				zap.String("email", email),
+			)
 
-		return nil, repo.ErrNotFound
-	} else if err != nil {
+			return nil, repo.ErrNotFound
+		}
+
 		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to get user",

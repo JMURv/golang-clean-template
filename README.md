@@ -2,7 +2,6 @@
 Find and replace all `app-template` to your project's name.
 As well, do it for `github.com/JMURv/golang-clean-template`, that used in go backend.
 
-
 ### GitHub Actions
 Specify **Docker Hub** `USERNAME`, `PASSWORD` and desired `IMAGE_NAME` secrets in GH Actions repo.
 
@@ -16,12 +15,6 @@ This is required to build and push docker image.
 
 ---
 ## Configuration
-
-### GitHub Actions
-- Specify **Docker Hub** `USERNAME`, `PASSWORD` and desired `IMAGE_NAME` secrets in GH Actions repo
-
-This is required to build and push docker image.
-
 ### App
 Configuration files for local dev placed in `/config`
 
