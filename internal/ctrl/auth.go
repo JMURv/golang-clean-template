@@ -52,7 +52,6 @@ func (c *Controller) GenPair(
 	defer span.Finish()
 
 	var res dto.TokenPair
-
 	access, refresh, err := c.au.GenPair(ctx, uid)
 	if err != nil {
 		return res, err

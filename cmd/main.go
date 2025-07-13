@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/cache/redis"
@@ -19,6 +20,8 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/smtp"
 	"go.uber.org/zap"
 )
+
+const cancelTimeout = 10 * time.Second
 
 func mustRegisterLogger(mode string) {
 	switch mode {
@@ -43,7 +46,8 @@ func main() {
 	conf := config.MustLoad(path)
 	mustRegisterLogger(conf.Mode)
 
-	go prometheus.New(conf.Server.Port + 5).Start(ctx)
+	prom := prometheus.New(conf.Server.PromPort)
+	go prom.Start()
 	go jaeger.Start(ctx, conf.ServiceName, conf)
 
 	au := auth.New(conf)
@@ -61,19 +65,26 @@ func main() {
 	<-c
 
 	zap.L().Info("Shutting down gracefully...")
-	if err := h.Close(ctx); err != nil {
+	sdCtx, sdCancel := context.WithTimeout(ctx, cancelTimeout)
+	defer sdCancel()
+
+	if err := h.Close(sdCtx); err != nil {
 		zap.L().Warn("Error closing handler", zap.Error(err))
 	}
 
-	if err := hg.Close(); err != nil {
+	if err := hg.Close(sdCtx); err != nil {
 		zap.L().Warn("Error closing grpc handler", zap.Error(err))
 	}
 
-	if err := cache.Close(); err != nil {
-		zap.L().Warn("Failed to close connection to cache: ", zap.Error(err))
+	if err := cache.Close(sdCtx); err != nil {
+		zap.L().Warn("Failed to close connection to cache", zap.Error(err))
 	}
 
-	if err := repo.Close(); err != nil {
+	if err := repo.Close(sdCtx); err != nil {
 		zap.L().Warn("Error closing repository", zap.Error(err))
+	}
+
+	if err := prom.Close(sdCtx); err != nil {
+		zap.L().Warn("Error closing prometheus", zap.Error(err))
 	}
 }

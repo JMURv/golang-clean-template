@@ -74,9 +74,20 @@ func (h *Handler) Start(port int) {
 	}
 }
 
-func (h *Handler) Close() error {
-	h.srv.GracefulStop()
-	return nil
+func (h *Handler) Close(ctx context.Context) error {
+	done := make(chan struct{})
+	go func() {
+		h.srv.GracefulStop()
+		close(done)
+	}()
+
+	select {
+	case <-ctx.Done():
+		h.srv.Stop()
+		return ctx.Err()
+	case <-done:
+		return nil
+	}
 }
 
 func (h *Handler) Procedure(ctx context.Context, req *gen.Empty) (*gen.Empty, error) {

@@ -1,13 +1,13 @@
 package captcha
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
 
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/dto"
+	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 )
 

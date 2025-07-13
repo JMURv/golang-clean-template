@@ -2,7 +2,6 @@ package ctrl
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -11,6 +10,7 @@ import (
 	md "github.com/JMURv/golang-clean-template/internal/models"
 	"github.com/JMURv/golang-clean-template/internal/repo"
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
+	"github.com/goccy/go-json"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
 )

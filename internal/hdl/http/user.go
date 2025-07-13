@@ -89,7 +89,6 @@ func (h *Handler) listUsers(w http.ResponseWriter, r *http.Request) {
 //	@Description	Returns the authenticated user's profile
 //	@Tags			User
 //	@Produce		json
-//	@Param			Authorization	header		string	true	"Bearer token, e.g. 'Bearer {jwt}'"
 //	@Success		200				{object}	models.User
 //	@Failure		401				{object}	utils.ErrorsResponse	"unauthorized"
 //	@Failure		404				{object}	utils.ErrorsResponse	"user not found"
@@ -223,7 +222,6 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request) {
 //	@Param			id				path		string					true	"User UUID"
 //	@Param			data			formData	string					true	"JSON payload in 'data' field"
 //	@Param			avatar			formData	file					false	"Avatar image file"
-//	@Param			Authorization	header		string					true	"Bearer token, e.g. 'Bearer {jwt}'"
 //	@Success		200				{object}	nil						"OK"
 //	@Failure		400				{object}	utils.ErrorsResponse	"bad request"
 //	@Failure		401				{object}	utils.ErrorsResponse	"unauthorized"
@@ -290,7 +288,6 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id				path		string					true	"User UUID"
-//	@Param			Authorization	header		string					true	"Bearer token, e.g. 'Bearer {jwt}'"
 //	@Success		204				{object}	nil						"No Content"
 //	@Failure		401				{object}	utils.ErrorsResponse	"unauthorized"
 //	@Failure		404				{object}	utils.ErrorsResponse	"user not found"

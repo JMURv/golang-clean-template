@@ -115,8 +115,8 @@ func (h *Handler) getDevice(w http.ResponseWriter, r *http.Request) {
 //	@Param			body	body	dto.UpdateDeviceRequest	true	"Update payload"
 //	@Accept			json
 //	@Produce		json
-//	@Param			Authorization	header		string					true	"Authorization token"
-//	@Success		200				{object}	nil						"OK"
+//	@Param			Authorization	header	string	true	"Authorization token"
+//	@Success		200				"OK"
 //	@Failure		400				{object}	utils.ErrorsResponse	"invalid device ID or payload"
 //	@Failure		404				{object}	utils.ErrorsResponse	"device not found"
 //	@Failure		500				{object}	utils.ErrorsResponse	"internal error"
@@ -168,8 +168,8 @@ func (h *Handler) updateDevice(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Device
 //	@Param			id	path	string	true	"Device UUID"
 //	@Produce		json
-//	@Param			Authorization	header		string					true	"Authorization token"
-//	@Success		204				{object}	nil						"No Content"
+//	@Param			Authorization	header	string	true	"Authorization token"
+//	@Success		204				"No Content"
 //	@Failure		400				{object}	utils.ErrorsResponse	"invalid device ID"
 //	@Failure		404				{object}	utils.ErrorsResponse	"device not found"
 //	@Failure		500				{object}	utils.ErrorsResponse	"internal error"

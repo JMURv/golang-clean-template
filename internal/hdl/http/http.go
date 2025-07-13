@@ -75,5 +75,15 @@ func (h *Handler) Start(port int) {
 }
 
 func (h *Handler) Close(ctx context.Context) error {
-	return h.srv.Shutdown(ctx)
+	done := make(chan error, 1)
+	go func() {
+		done <- h.srv.Shutdown(ctx)
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-done:
+		return err
+	}
 }

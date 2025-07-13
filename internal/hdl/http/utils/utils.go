@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -18,6 +17,7 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/hdl/validation"
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 	"github.com/go-playground/validator/v10"
+	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 )
 

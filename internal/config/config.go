@@ -94,7 +94,7 @@ func MustLoad(path string) Config {
 	if err := env.Parse(&conf); err != nil {
 		panic("failed to parse environment variables: " + err.Error())
 	}
-	log.Println("Load configuration from environment")
 
+	log.Println("Load configuration from environment")
 	return conf
 }

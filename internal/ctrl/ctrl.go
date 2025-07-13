@@ -2,7 +2,6 @@ package ctrl
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
@@ -26,7 +25,7 @@ type S3Service interface {
 }
 
 type CacheService interface {
-	io.Closer
+	Close(ctx context.Context) error
 	GetToStruct(ctx context.Context, key string, dest any) error
 	Set(ctx context.Context, t time.Duration, key string, val any)
 	Delete(ctx context.Context, key string)

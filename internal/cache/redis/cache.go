@@ -2,13 +2,13 @@ package redis
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/cache"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/go-redis/redis/v8"
+	"github.com/goccy/go-json"
 	ot "github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
@@ -34,8 +34,18 @@ func New(conf config.Config) *Cache {
 	return &Cache{cli: cli}
 }
 
-func (c *Cache) Close() error {
-	return c.cli.Close()
+func (c *Cache) Close(ctx context.Context) error {
+	done := make(chan error, 1)
+	go func() {
+		done <- c.cli.Close()
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-done:
+		return err
+	}
 }
 
 func (c *Cache) GetToStruct(ctx context.Context, key string, dest any) error {

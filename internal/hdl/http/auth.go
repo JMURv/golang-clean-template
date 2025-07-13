@@ -47,7 +47,6 @@ func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request) {
 
 	req := &dto.EmailAndPasswordRequest{}
 	if ok = utils.ParseAndValidate(w, r, req); !ok {
-		utils.ErrResponse(w, http.StatusBadRequest, hdl.ErrDecodeRequest)
 		return
 	}
 
