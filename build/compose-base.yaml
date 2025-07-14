@@ -75,6 +75,9 @@ services:
       db:
         condition: service_healthy
         restart: true
+      minio:
+        condition: service_healthy
+        restart: true
       redis:
         condition: service_started
     networks: [app-template]
