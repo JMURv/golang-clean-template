@@ -34,6 +34,7 @@ type authConfig struct {
 		Issuer string `env:"JWT_ISSUER,required"`
 	}
 	Captcha struct {
+		Enabled bool   `env:"CAPTCHA_ENABLED" envDefault:"false"`
 		SiteKey string `env:"CAPTCHA_SITE_KEY"`
 		Secret  string `env:"CAPTCHA_SECRET"`
 	}

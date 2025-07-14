@@ -24,16 +24,23 @@ const (
 const captchaScore = 0.1
 
 type Core struct {
-	secret string
+	enabled bool
+	secret  string
 }
 
 func New(conf config.Config) *Core {
 	return &Core{
-		secret: conf.Auth.Captcha.Secret,
+		enabled: conf.Auth.Captcha.Enabled,
+		secret:  conf.Auth.Captcha.Secret,
 	}
 }
 
 func (c *Core) VerifyRecaptcha(token string, action Actions) (bool, error) {
+	// Use for testing purposes
+	if !c.enabled {
+		return true, nil
+	}
+
 	resp, err := http.PostForm(
 		"https://www.google.com/recaptcha/api/siteverify",
 		url.Values{
@@ -63,5 +70,9 @@ func (c *Core) VerifyRecaptcha(token string, action Actions) (bool, error) {
 		return false, err
 	}
 
-	return result.Success && result.Score > captchaScore && result.Action == string(action), nil
+	score := result.Success && result.Score > captchaScore
+	if !score {
+		zap.L().Debug("not enough score", zap.Float64("score", result.Score))
+	}
+	return score && result.Action == string(action), nil
 }

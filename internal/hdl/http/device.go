@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"net/http"
 
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
@@ -34,7 +35,7 @@ func (h *Handler) RegisterDeviceRoutes() {
 //	@Failure		500				{object}	utils.ErrorsResponse	"internal error"
 //	@Router			/device [get]
 func (h *Handler) listDevices(w http.ResponseWriter, r *http.Request) {
-	uid, ok := r.Context().Value("uid").(uuid.UUID)
+	uid, ok := r.Context().Value(config.UidKey).(uuid.UUID)
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),
@@ -82,7 +83,7 @@ func (h *Handler) getDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uid, ok := r.Context().Value("uid").(uuid.UUID)
+	uid, ok := r.Context().Value(config.UidKey).(uuid.UUID)
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),
@@ -132,7 +133,7 @@ func (h *Handler) updateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uid, ok := r.Context().Value("uid").(uuid.UUID)
+	uid, ok := r.Context().Value(config.UidKey).(uuid.UUID)
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),
@@ -185,7 +186,7 @@ func (h *Handler) deleteDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uid, ok := r.Context().Value("uid").(uuid.UUID)
+	uid, ok := r.Context().Value(config.UidKey).(uuid.UUID)
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),

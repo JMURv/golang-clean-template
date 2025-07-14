@@ -143,7 +143,7 @@ func (h *Handler) refresh(w http.ResponseWriter, r *http.Request) {
 //	@Failure		500				{object}	utils.ErrorsResponse	"internal error"
 //	@Router			/auth/logout [post]
 func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
-	uid, ok := r.Context().Value("uid").(uuid.UUID)
+	uid, ok := r.Context().Value(config.UidKey).(uuid.UUID)
 	if !ok {
 		zap.L().Error(
 			hdl.ErrFailedToGetUUID.Error(),

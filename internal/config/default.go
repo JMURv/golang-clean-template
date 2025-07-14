@@ -2,6 +2,14 @@ package config
 
 import "time"
 
+type ctxKey string
+
+const (
+	UidKey ctxKey = "uid"
+	IpKey  ctxKey = "ip"
+	UaKey  ctxKey = "ua"
+)
+
 const (
 	DefaultPage      = 1
 	DefaultSize      = 40

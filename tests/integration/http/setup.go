@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/cache/redis"
@@ -14,6 +13,7 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/smtp"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
+	"github.com/jackc/pgx/v5"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"go.uber.org/zap"
@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -32,6 +33,12 @@ WHERE schemaname = 'public';
 `
 
 var rootDir = filepath.Join("..", "..", "..")
+
+var conf config.Config
+
+var redisC testcontainers.Container
+var minioC testcontainers.Container
+var pgC testcontainers.Container
 
 func getRedis() testcontainers.Container {
 	ctx := context.Background()
@@ -59,7 +66,6 @@ func getRedis() testcontainers.Container {
 		panic(err)
 	}
 
-	zap.L().Info("Redis container is ready")
 	return redisC
 }
 
@@ -118,7 +124,7 @@ func getMinio() testcontainers.Container {
 		Cmd:   []string{"server", "/data", "--console-address", ":9001"},
 		WaitingFor: wait.ForAll(
 			wait.ForListeningPort("9000/tcp"),
-			wait.ForHTTP("/minio/health/live").WithPort("9000/tcp"),
+			wait.ForHTTP("/minio/health/ready").WithPort("9000/tcp"),
 		),
 		ExposedPorts: []string{"9000/tcp", "9001/tcp"},
 		Env: map[string]string{
@@ -158,20 +164,6 @@ func getMinio() testcontainers.Container {
 func setupTestServer() (*httptest.Server, func(t *testing.T)) {
 	zap.ReplaceGlobals(zap.Must(zap.NewDevelopment()))
 
-	conf := config.MustLoad(
-		filepath.ToSlash(
-			filepath.Join(rootDir, "config", ".env.integration"),
-		),
-	)
-
-	_ = os.Setenv("MIGRATIONS_PATH", filepath.ToSlash(
-		filepath.Join(rootDir, "internal", "repo", "db", "migration"),
-	))
-
-	redisC := getRedis()
-	pgC := getPostgres()
-	minioC := getMinio()
-
 	au := auth.New(conf)
 	cache := redis.New(conf)
 	repo := db.New(conf)
@@ -181,34 +173,31 @@ func setupTestServer() (*httptest.Server, func(t *testing.T)) {
 	ts := httptest.NewServer(h.Router)
 
 	cleanupFunc := func(t *testing.T) {
+		ctx := context.Background()
 		ts.Close()
 
-		conn, err := sql.Open(
-			"pgx", fmt.Sprintf(
-				"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-				conf.DB.User,
-				conf.DB.Password,
-				conf.DB.Host,
-				conf.DB.Port,
-				conf.DB.Database,
-			),
-		)
+		conn, err := pgx.Connect(ctx, fmt.Sprintf(
+			"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+			conf.DB.User,
+			conf.DB.Password,
+			conf.DB.Host,
+			conf.DB.Port,
+			conf.DB.Database,
+		))
 		if err != nil {
 			zap.L().Fatal("Failed to connect to the database", zap.Error(err))
 		}
 
-		if err = conn.Ping(); err != nil {
+		if err = conn.Ping(ctx); err != nil {
 			zap.L().Fatal("Failed to ping the database", zap.Error(err))
 		}
 
-		rows, err := conn.Query(getTables)
+		rows, err := conn.Query(ctx, getTables)
 		if err != nil {
 			zap.L().Fatal("Failed to fetch table names", zap.Error(err))
 		}
-		defer func(rows *sql.Rows) {
-			if err := rows.Close(); err != nil {
-				zap.L().Debug("Error while closing rows", zap.Error(err))
-			}
+		defer func(rows pgx.Rows) {
+			rows.Close()
 		}(rows)
 
 		var tables []string
@@ -224,15 +213,43 @@ func setupTestServer() (*httptest.Server, func(t *testing.T)) {
 			return
 		}
 
-		_, err = conn.Exec(fmt.Sprintf("TRUNCATE TABLE %v RESTART IDENTITY CASCADE;", strings.Join(tables, ", ")))
+		_, err = conn.Exec(ctx, fmt.Sprintf("TRUNCATE TABLE %v RESTART IDENTITY CASCADE;", strings.Join(tables, ", ")))
 		if err != nil {
 			zap.L().Fatal("Failed to truncate tables", zap.Error(err))
 		}
-
-		testcontainers.CleanupContainer(t, redisC)
-		testcontainers.CleanupContainer(t, pgC)
-		testcontainers.CleanupContainer(t, minioC)
 	}
 
 	return ts, cleanupFunc
+}
+
+func init() {
+	conf = config.MustLoad(
+		filepath.ToSlash(
+			filepath.Join(rootDir, "config", ".env.integration"),
+		),
+	)
+
+	_ = os.Setenv("MIGRATIONS_PATH", filepath.ToSlash(
+		filepath.Join(rootDir, "internal", "repo", "db", "migration"),
+	))
+
+	wg := &sync.WaitGroup{}
+	wg.Add(3)
+
+	go func() {
+		redisC = getRedis()
+		wg.Done()
+	}()
+
+	go func() {
+		minioC = getMinio()
+		wg.Done()
+	}()
+
+	go func() {
+		pgC = getPostgres()
+		wg.Done()
+	}()
+
+	wg.Wait()
 }

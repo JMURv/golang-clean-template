@@ -91,8 +91,8 @@ func ParseAndValidate(w http.ResponseWriter, r *http.Request, dst any) bool {
 	}
 
 	if err = validation.V.Struct(dst); err != nil {
+		zap.L().Debug("failed to validate request", zap.Error(err))
 		ErrResponse(w, http.StatusBadRequest, err)
-
 		return false
 	}
 
@@ -100,13 +100,15 @@ func ParseAndValidate(w http.ResponseWriter, r *http.Request, dst any) bool {
 }
 
 func ParseDeviceByRequest(ctx context.Context) (dto.DeviceRequest, bool) {
-	ip, ok := ctx.Value("ip").(string)
+	ip, ok := ctx.Value(config.IpKey).(string)
 	if !ok {
+		zap.L().Debug("failed to parse ip from request")
 		return dto.DeviceRequest{}, false
 	}
 
-	ua, ok := ctx.Value("ua").(string)
+	ua, ok := ctx.Value(config.UaKey).(string)
 	if !ok {
+		zap.L().Debug("failed to parse user-agent from request")
 		return dto.DeviceRequest{}, false
 	}
 

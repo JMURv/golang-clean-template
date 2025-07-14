@@ -244,12 +244,25 @@ func (r *Repository) CreateUser(
 	if err != nil {
 		trgtErr := &pgconn.PgError{}
 		if errors.As(err, &trgtErr) {
-			zap.L().Debug(
-				"user already exists",
+			if trgtErr.Code == "23505" {
+				zap.L().Debug(
+					"user already exists",
+					zap.String("op", op),
+					zap.String("email", req.Email),
+					zap.String("pg_code", trgtErr.Code),
+					zap.String("constraint", trgtErr.ConstraintName),
+					zap.String("detail", trgtErr.Detail),
+				)
+				return uuid.Nil, repo.ErrAlreadyExists
+			}
+			zap.L().Error(
+				"undefined pg error",
 				zap.String("op", op),
+				zap.String("email", req.Email),
+				zap.String("pg_code", trgtErr.Code),
+				zap.String("constraint", trgtErr.ConstraintName),
+				zap.String("detail", trgtErr.Detail),
 			)
-
-			return uuid.Nil, repo.ErrAlreadyExists
 		}
 
 		span.SetTag("error", true)
@@ -299,9 +312,7 @@ func (r *Repository) UpdateUser(
 	}
 
 	defer func() {
-		err := tx.Rollback()
-		if err != nil && !errors.Is(err, sql.ErrTxDone) ||
-			!errors.Is(err, repo.ErrNotFound) {
+		if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
 			span.SetTag("error", true)
 			zap.L().Error(
 				"error while transaction rollback",
@@ -352,8 +363,7 @@ func (r *Repository) UpdateUser(
 		return repo.ErrNotFound
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.Commit(); err != nil {
 		span.SetTag("error", true)
 		zap.L().Error(
 			"failed to commit transaction",

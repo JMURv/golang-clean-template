@@ -95,7 +95,7 @@ func (h *Handler) listUsers(w http.ResponseWriter, r *http.Request) {
 //	@Failure		500	{object}	utils.ErrorsResponse	"internal error"
 //	@Router			/users/me [get]
 func (h *Handler) getMe(w http.ResponseWriter, r *http.Request) {
-	uid, ok := r.Context().Value("uid").(uuid.UUID)
+	uid, ok := r.Context().Value(config.UidKey).(uuid.UUID)
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),

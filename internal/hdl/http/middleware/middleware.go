@@ -18,14 +18,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type ctxKey string
-
-const (
-	uidKey ctxKey = "uid"
-	ipKey  ctxKey = "ip"
-	uaKey  ctxKey = "ua"
-)
-
 type AuthOpts struct {
 	CheckAuthor bool
 }
@@ -66,7 +58,7 @@ func Auth(au auth.Core, opts AuthOpts) func(http.Handler) http.Handler {
 					}
 				}
 
-				ctx := context.WithValue(r.Context(), uidKey, claims.UID)
+				ctx := context.WithValue(r.Context(), config.UidKey, claims.UID)
 				next.ServeHTTP(w, r.WithContext(ctx))
 			},
 		)
@@ -105,8 +97,8 @@ func Device(next http.Handler) http.Handler {
 			}
 
 			zap.L().Debug("device info", zap.String("ip", ip), zap.String("ua", ua))
-			ctx := context.WithValue(r.Context(), ipKey, ip)
-			ctx = context.WithValue(ctx, uaKey, ua)
+			ctx := context.WithValue(r.Context(), config.IpKey, ip)
+			ctx = context.WithValue(ctx, config.UaKey, ua)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		},
 	)
