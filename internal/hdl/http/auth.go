@@ -17,9 +17,9 @@ import (
 )
 
 func (h *Handler) RegisterAuthRoutes() {
-	h.router.With(mid.Device).Post("/auth/jwt", h.authenticate)
-	h.router.With(mid.Device).Post("/auth/jwt/refresh", h.refresh)
-	h.router.With(mid.Auth(h.au, mid.AuthOpts{})).Post("/auth/logout", h.logout)
+	h.Router.With(mid.Device).Post("/auth/jwt", h.authenticate)
+	h.Router.With(mid.Device).Post("/auth/jwt/refresh", h.refresh)
+	h.Router.With(mid.Auth(h.au, mid.AuthOpts{})).Post("/auth/logout", h.logout)
 }
 
 // authenticate godoc

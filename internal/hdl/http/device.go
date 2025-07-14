@@ -16,10 +16,10 @@ import (
 )
 
 func (h *Handler) RegisterDeviceRoutes() {
-	h.router.With(mid.Auth(h.au, mid.AuthOpts{})).Get("/device", h.listDevices)
-	h.router.With(mid.Auth(h.au, mid.AuthOpts{})).Get("/device/{id}", h.getDevice)
-	h.router.With(mid.Auth(h.au, mid.AuthOpts{})).Put("/device/{id}", h.updateDevice)
-	h.router.With(mid.Auth(h.au, mid.AuthOpts{})).Delete("/device/{id}", h.deleteDevice)
+	h.Router.With(mid.Auth(h.au, mid.AuthOpts{})).Get("/device", h.listDevices)
+	h.Router.With(mid.Auth(h.au, mid.AuthOpts{})).Get("/device/{id}", h.getDevice)
+	h.Router.With(mid.Auth(h.au, mid.AuthOpts{})).Put("/device/{id}", h.updateDevice)
+	h.Router.With(mid.Auth(h.au, mid.AuthOpts{})).Delete("/device/{id}", h.deleteDevice)
 }
 
 // listDevices godoc

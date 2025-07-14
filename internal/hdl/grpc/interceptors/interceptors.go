@@ -38,7 +38,6 @@ func Auth(au auth.Core) grpc.UnaryServerInterceptor {
 		}
 
 		ctx = context.WithValue(ctx, "uid", claims.UID)
-
 		return handler(ctx, req)
 	}
 }

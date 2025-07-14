@@ -20,13 +20,13 @@ import (
 )
 
 func (h *Handler) RegisterUserRoutes() {
-	h.router.Post("/users/exists", h.existsUser)
-	h.router.With(mid.Auth(h.au, mid.AuthOpts{})).Get("/users/me", h.getMe)
-	h.router.Get("/users", h.listUsers)
-	h.router.Post("/users", h.createUser)
-	h.router.Get("/users/{id}", h.getUser)
-	h.router.With(mid.Auth(h.au, mid.AuthOpts{CheckAuthor: true})).Put("/users/{id}", h.updateUser)
-	h.router.With(mid.Auth(h.au, mid.AuthOpts{})).Delete("/users/{id}", h.deleteUser)
+	h.Router.Post("/users/exists", h.existsUser)
+	h.Router.With(mid.Auth(h.au, mid.AuthOpts{})).Get("/users/me", h.getMe)
+	h.Router.Get("/users", h.listUsers)
+	h.Router.Post("/users", h.createUser)
+	h.Router.Get("/users/{id}", h.getUser)
+	h.Router.With(mid.Auth(h.au, mid.AuthOpts{CheckAuthor: true})).Put("/users/{id}", h.updateUser)
+	h.Router.With(mid.Auth(h.au, mid.AuthOpts{})).Delete("/users/{id}", h.deleteUser)
 }
 
 // existsUser godoc
