@@ -7,9 +7,6 @@ vars:
   PROD_ENV_FILE: "build/configs/envs/.env.prod"
   PROD_DOCKER_COMPOSE_PATH: "build/compose.yaml"
 
-  TEST_ENV_FILE: "build/configs/envs/.env.test"
-  TEST_DOCKER_COMPOSE_PATH: "build/compose-test.yaml"
-
 tasks:
   # LOCAL
   run:
@@ -91,16 +88,6 @@ tasks:
     desc: Shutdown dev compose
     cmds:
       - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} down"
-
-  dc-test:
-    desc: Run integration tests helper containers
-    cmds:
-      - "docker compose --env-file {{.TEST_ENV_FILE}} -f {{.TEST_DOCKER_COMPOSE_PATH}} up"
-
-  dc-test-down:
-    desc: Shutdown integration tests helper containers
-    cmds:
-      - "docker compose -f {{.TEST_DOCKER_COMPOSE_PATH}} down"
   # END
 
   # K8s
