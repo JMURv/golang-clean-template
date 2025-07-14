@@ -103,11 +103,8 @@ task k-down
 
 ## Tests
 ### Integration
-Spin up all containers for `integration` tests:
-```shell
-task dc-test
-```
-Wait until all containers are ready and then run:
+Run:
 ```shell
 task t-integration
 ```
+It will spin up all containers for integration testing automatically using `testcontainers`.
