@@ -1,19 +1,28 @@
-name: app-template
+name: app-template-dev
 services:
   redis:
     extends:
-      file: compose-base.yaml
+      file: compose.yaml
       service: redis
+    volumes: !override
+      - redis_data_dev:/data
+    networks: !override [ app-template-dev ]
 
   db:
     extends:
-      file: compose-base.yaml
+      file: compose.yaml
       service: db
+    volumes: !override
+      - pg_data_dev:/var/lib/postgresql/data
+    networks: !override [ app-template-dev ]
 
   minio:
     extends:
-      file: compose-base.yaml
+      file: compose.yaml
       service: minio
+    volumes: !override
+      - minio_data_dev:/data
+    networks: !override [ app-template-dev ]
 
   backend:
     image: app-template-backend:latest-dev
@@ -23,8 +32,9 @@ services:
     env_file: !override
       - ./configs/envs/.env.dev
     extends:
-      file: compose-base.yaml
+      file: compose.yaml
       service: backend
+    networks: !override [ app-template-dev ]
     develop:
       watch: !override
         - action: sync
@@ -35,10 +45,10 @@ services:
             - vendor
 
 volumes:
-  pg_data:
-  minio_data:
-  redis_data:
+  pg_data_dev:
+  minio_data_dev:
+  redis_data_dev:
 
 networks:
-  app-template:
-    name: app-template
+  app-template-dev:
+    name: app-template-dev

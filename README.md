@@ -1,4 +1,6 @@
 ### REMOVE ME
+TODO: Add install commands for swag, protoc and k6
+
 Find and replace all `app-template` to your project's name.
 As well, do it for `github.com/JMURv/golang-clean-template`, that used in go backend.
 
@@ -62,24 +64,37 @@ Run dev (requires `build/configs/envs/.env.dev`):
 task dc-dev
 ```
 
+Run dev with observation containers:
+```shell
+task dc-dev-obs
+```
+
 Run prod (requires `build/configs/envs/.env.prod`):
 ```shell
 task dc-prod
 ```
 
-Also, there is ability to up svcs like: `prometheus`, `jaeger`, `node-exporter`, `grafana`.
+Run prod with observation containers:
+```shell
+task dc-prod-obs
+```
 
-You can include necessary svcs manually in your desired `compose*.yaml` file from `compose-base.yaml`.
+`compose-observe.yaml` file starts svcs like: `prometheus`, `jaeger`, `node-exporter`, `grafana` and etc.
 
 Services are available at:
 
-| Сервис     | Адрес                  |
-|------------|------------------------|
-| App (HTTP) | http://localhost:8080  |
-| App (GRPC) | http://localhost:50050 |
-| Prometheus | http://localhost:9090  |
-| Jaeger     | http://localhost:16686 |
-| Grafana    | http://localhost:3000  |
+| Сервис           | Адрес                  |
+|------------------|------------------------|
+| App (HTTP)       | http://localhost:8080  |
+| App (GRPC)       | http://localhost:50050 |
+| App (PROMETHEUS) | http://localhost:8085  |
+| Prometheus       | http://localhost:9090  |
+| Node-exporter    | http://localhost:9100  |
+| Jaeger           | http://localhost:16686 |
+| Loki             | http://localhost:3100  |
+| Grafana          | http://localhost:3000  |
+
+More information could be found inside `compose-observe.yaml`.
 
 ___
 

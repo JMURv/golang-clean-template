@@ -13,6 +13,7 @@ bin/*
 .env*
 !.env.example
 !.env.integration
+!.env.k6
 
 # k8s
 cfg.yaml

@@ -1,0 +1,35 @@
+name: app-template-k6
+services:
+  redis:
+    extends:
+      service: redis
+      file: compose.yaml
+    volumes: !reset
+    networks: !override [ app-template-k6 ]
+
+  minio:
+    extends:
+      service: minio
+      file: compose.yaml
+    volumes: !reset
+    networks: !override [ app-template-k6 ]
+
+  db:
+    extends:
+      service: db
+      file: compose.yaml
+    volumes: !reset
+    networks: !override [ app-template-k6 ]
+
+  backend:
+    extends:
+      service: backend
+      file: compose.yaml
+    env_file: !override
+      - ./configs/envs/.env.k6
+    networks: !override [ app-template-k6 ]
+
+
+networks:
+  app-template-k6:
+    name: app-template-k6
