@@ -123,3 +123,8 @@ Run:
 task t-integration
 ```
 It will spin up all containers for integration testing automatically using `testcontainers`.
+
+### Load testing
+```shell
+task dc-k6
+```

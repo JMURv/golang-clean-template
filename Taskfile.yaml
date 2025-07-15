@@ -1,6 +1,7 @@
 version: 3
 
 vars:
+  PROJECT_NAME: "app-template"
   DEV_ENV_PATH: "build/configs/envs/.env.dev"
   DEV_DC_PATH: "build/compose-dev.yaml"
 
@@ -65,6 +66,13 @@ tasks:
   # END
 
   # DOCKER
+  net:
+    desc: Create all networks
+    cmds:
+      - "docker network create {{.PROJECT_NAME}}-dev || true"
+      - "docker network create {{.PROJECT_NAME}}-prod || true"
+      - "docker network create {{.PROJECT_NAME}}-k6 || true"
+
   dc-prod:
     desc: Run prod compose
     cmds:
@@ -73,6 +81,7 @@ tasks:
   dc-prod-obs:
     desc: Run prod compose with observe
     cmds:
+      - "task net"
       - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} -f {{.OBSERVE_DC_PATH}} up --watch"
 
   dc-prod-build:
@@ -98,6 +107,7 @@ tasks:
   dc-dev-obs:
     desc: Run dev compose with observe
     cmds:
+      - "task net"
       - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} -f {{.OBSERVE_DC_PATH}} up --watch"
 
   dc-dev-build:
@@ -118,7 +128,19 @@ tasks:
   dc-k6:
     desc: Run k6 compose
     cmds:
-      - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} up"
+      - "task net"
+      - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} -f {{.OBSERVE_DC_PATH}} up"
+
+  dc-k6-build:
+    desc: Build k6 containers
+    cmds:
+      - "task net"
+      - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} build"
+
+  dc-k6-down:
+    desc: Shutdown k6 containers
+    cmds:
+      - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} -f {{.OBSERVE_DC_PATH}} down"
 
   # END
 

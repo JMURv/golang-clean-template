@@ -4,22 +4,23 @@ services:
     extends:
       service: redis
       file: compose.yaml
-    volumes: !reset
-    networks: !override [ app-template-k6 ]
+    volumes: !reset []
+    networks: [ app-template-k6 ]
 
   minio:
     extends:
       service: minio
       file: compose.yaml
-    volumes: !reset
-    networks: !override [ app-template-k6 ]
+    volumes: !reset []
+    networks: [ app-template-k6 ]
 
   db:
     extends:
       service: db
       file: compose.yaml
-    volumes: !reset
-    networks: !override [ app-template-k6 ]
+    volumes: !reset []
+    networks: [ app-template-k6 ]
+    command: postgres -c "max_connections=50000"
 
   backend:
     extends:
@@ -27,8 +28,24 @@ services:
       file: compose.yaml
     env_file: !override
       - ./configs/envs/.env.k6
-    networks: !override [ app-template-k6 ]
+    networks: [ app-template-k6 ]
 
+  k6:
+    container_name: k6
+    image: grafana/k6:latest
+    volumes:
+      - ../tests/load/script.js:/scripts/script.js
+    environment:
+      K6_OUT: experimental-prometheus-rw
+      K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
+      BASE_URL: http://backend:8080
+    command: run /scripts/script.js
+    depends_on:
+      prometheus:
+        condition: service_started
+      backend:
+        condition: service_healthy
+    networks: [ app-template-k6 ]
 
 networks:
   app-template-k6:

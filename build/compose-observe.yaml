@@ -8,18 +8,21 @@ services:
       - "14268:14268"
       - "16686:16686"
       - "6831:6831/udp"
-    networks: [ app-template-prod, app-template-dev ]
+    networks: [ app-template-prod, app-template-dev, app-template-k6 ]
 
   prometheus:
     container_name: prometheus
     image: prom/prometheus:latest
     restart: unless-stopped
+    command:
+      - --web.enable-remote-write-receiver
+      - --config.file=/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     volumes:
       - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
-    networks: [ app-template-prod, app-template-dev ]
+    networks: [ app-template-prod, app-template-dev, app-template-k6 ]
 
   node-exp:
     container_name: node-exp
@@ -27,7 +30,7 @@ services:
     restart: unless-stopped
     ports:
       - "9100:9100"
-    networks: [ app-template-prod, app-template-dev ]
+    networks: [ app-template-prod, app-template-dev, app-template-k6 ]
 
   grafana:
     container_name: grafana
@@ -40,7 +43,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
-    networks: [ app-template-prod, app-template-dev ]
+    networks: [ app-template-prod, app-template-dev, app-template-k6 ]
 
   loki:
     container_name: loki
@@ -52,7 +55,7 @@ services:
     volumes:
       - loki_data:/loki
       - ./configs/loki:/etc/loki
-    networks: [ app-template-prod, app-template-dev ]
+    networks: [ app-template-prod, app-template-dev, app-template-k6 ]
 
   promtail:
     container_name: promtail
@@ -65,7 +68,7 @@ services:
     command: -config.file=/etc/promtail/promtail-config.yaml
     depends_on:
       - loki
-    networks: [ app-template-prod, app-template-dev ]
+    networks: [ app-template-prod, app-template-dev, app-template-k6 ]
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter
@@ -76,7 +79,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks: [ app-template-prod, app-template-dev ]
+    networks: [ app-template-prod, app-template-dev, app-template-k6 ]
 
   redis-exporter:
     image: oliver006/redis_exporter:v1.43.0
@@ -87,7 +90,7 @@ services:
     depends_on:
       redis:
         condition: service_started
-    networks: [ app-template-prod, app-template-dev ]
+    networks: [ app-template-prod, app-template-dev, app-template-k6 ]
 
 volumes:
   prometheus_data:
@@ -98,6 +101,11 @@ networks:
   app-template-prod:
     name: app-template-prod
     external: true
+
   app-template-dev:
     name: app-template-dev
+    external: true
+
+  app-template-k6:
+    name: app-template-k6
     external: true

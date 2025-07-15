@@ -81,6 +81,7 @@ func (c *Core) NewToken(ctx context.Context, uid uuid.UUID, d time.Duration) (st
 				ExpiresAt: jwt.NewNumericDate(time.Now().Add(d)),
 				IssuedAt:  jwt.NewNumericDate(time.Now()),
 				Issuer:    c.issuer,
+				ID:        uuid.New().String(),
 			},
 		},
 	).SignedString(c.secret)
