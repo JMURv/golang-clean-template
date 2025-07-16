@@ -166,29 +166,29 @@ tasks:
   t-http:
     desc: Test http handlers
     cmds:
-      - "go test ./internal/hdl/http"
+      - "go test ./internal/hdl/http -v"
       - "go test -coverprofile=cov_http.out ./internal/hdl/http && go tool cover -func=cov_http.out"
 
   t-grpc:
     desc: Test grpc handlers
     cmds:
-      - "go test ./internal/hdl/grpc"
+      - "go test ./internal/hdl/grpc -v"
       - "go test -coverprofile=cov_grpc.out ./internal/hdl/grpc && go tool cover -func=cov_grpc.out"
 
   t-ctrl:
     desc: Run ctrl tests
     cmds:
-      - "go test ./internal/ctrl"
+      - "go test ./internal/ctrl -v"
       - "go test -coverprofile=cov_ctrl.out ./internal/ctrl && go tool cover -func=cov_ctrl.out"
 
   t-repo:
     desc: Run repo tests
     cmds:
-      - "go test ./internal/repo/db"
+      - "go test ./internal/repo/db -v"
       - "go test -coverprofile=cov_repo.out ./internal/repo/db && go tool cover -func=cov_repo.out"
 
   t-integration:
     desc: Run integration tests
     cmds:
-      - "go test -v ./tests/integration/..."
+      - "go test ./tests/integration/... -v"
   # END

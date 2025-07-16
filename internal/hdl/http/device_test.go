@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	"github.com/JMURv/golang-clean-template/internal/hdl/http/utils"
@@ -130,7 +131,7 @@ func TestHandler_ListDevices(t *testing.T) {
 			tt.expect()
 
 			req := httptest.NewRequest(http.MethodGet, uri, nil)
-			ctx := context.WithValue(req.Context(), "uid", tt.uid)
+			ctx := context.WithValue(req.Context(), config.UidKey, tt.uid)
 			req = req.WithContext(ctx)
 
 			w := httptest.NewRecorder()
@@ -267,7 +268,7 @@ func TestHandler_GetDevice(t *testing.T) {
 			uri := fmt.Sprintf(uriTemplate, tt.deviceID)
 			req := httptest.NewRequest(http.MethodGet, uri, nil)
 
-			ctx := context.WithValue(req.Context(), "uid", tt.uid)
+			ctx := context.WithValue(req.Context(), config.UidKey, tt.uid)
 			req = req.WithContext(ctx)
 
 			rctx := chi.NewRouteContext()
@@ -447,7 +448,7 @@ func TestHandler_UpdateDevice(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPut, uri, bytes.NewBuffer(body))
 			req.Header.Set("Content-Type", "application/json")
 
-			ctx := context.WithValue(req.Context(), "uid", tt.uid)
+			ctx := context.WithValue(req.Context(), config.UidKey, tt.uid)
 			req = req.WithContext(ctx)
 
 			rctx := chi.NewRouteContext()
@@ -590,7 +591,7 @@ func TestHandler_DeleteDevice(t *testing.T) {
 			uri := fmt.Sprintf(uriTemplate, tt.deviceID)
 			req := httptest.NewRequest(http.MethodDelete, uri, nil)
 
-			ctx := context.WithValue(req.Context(), "uid", tt.uid)
+			ctx := context.WithValue(req.Context(), config.UidKey, tt.uid)
 			req = req.WithContext(ctx)
 
 			rctx := chi.NewRouteContext()

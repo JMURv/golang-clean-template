@@ -39,7 +39,7 @@ func (h *Handler) listDevices(w http.ResponseWriter, r *http.Request) {
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),
-			zap.Any("uid", r.Context().Value("uid")),
+			zap.Any("uid", r.Context().Value(config.UidKey)),
 		)
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrFailedToParseUUID)
 		return
@@ -87,7 +87,7 @@ func (h *Handler) getDevice(w http.ResponseWriter, r *http.Request) {
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),
-			zap.Any("uid", r.Context().Value("uid")),
+			zap.Any("uid", r.Context().Value(config.UidKey)),
 		)
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrFailedToParseUUID)
 		return
@@ -137,7 +137,7 @@ func (h *Handler) updateDevice(w http.ResponseWriter, r *http.Request) {
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),
-			zap.Any("uid", r.Context().Value("uid")),
+			zap.Any("uid", r.Context().Value(config.UidKey)),
 		)
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrFailedToParseUUID)
 		return
@@ -190,7 +190,7 @@ func (h *Handler) deleteDevice(w http.ResponseWriter, r *http.Request) {
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),
-			zap.Any("uid", r.Context().Value("uid")),
+			zap.Any("uid", r.Context().Value(config.UidKey)),
 		)
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrFailedToParseUUID)
 		return

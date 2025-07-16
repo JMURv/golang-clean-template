@@ -99,7 +99,7 @@ func (h *Handler) getMe(w http.ResponseWriter, r *http.Request) {
 	if uid == uuid.Nil || !ok {
 		zap.L().Error(
 			hdl.ErrFailedToParseUUID.Error(),
-			zap.Any("uid", r.Context().Value("uid")),
+			zap.Any("uid", r.Context().Value(config.UidKey)),
 		)
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrFailedToParseUUID)
 		return

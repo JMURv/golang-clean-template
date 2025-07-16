@@ -73,7 +73,7 @@ func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		utils.ErrResponse(w, http.StatusInternalServerError, err)
+		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
 	}
 
@@ -147,7 +147,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		zap.L().Error(
 			hdl.ErrFailedToGetUUID.Error(),
-			zap.Any("uid", r.Context().Value("uid")),
+			zap.Any("uid", r.Context().Value(config.UidKey)),
 		)
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
@@ -158,10 +158,9 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, ctrl.ErrNotFound) {
 			utils.ErrResponse(w, http.StatusNotFound, err)
 			return
-		} else {
-			utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
-			return
 		}
+		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		return
 	}
 
 	http.SetCookie(

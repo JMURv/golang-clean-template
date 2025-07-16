@@ -2,6 +2,7 @@ package interceptors
 
 import (
 	"context"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
@@ -37,7 +38,7 @@ func Auth(au auth.Core) grpc.UnaryServerInterceptor {
 			return handler(ctx, req)
 		}
 
-		ctx = context.WithValue(ctx, "uid", claims.UID)
+		ctx = context.WithValue(ctx, config.UidKey, claims.UID)
 		return handler(ctx, req)
 	}
 }

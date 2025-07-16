@@ -428,7 +428,7 @@ func TestHandler_GetMe(t *testing.T) {
 
 			req := httptest.NewRequest(http.MethodGet, uri, nil)
 
-			ctx := context.WithValue(req.Context(), "uid", tt.uid)
+			ctx := context.WithValue(req.Context(), config.UidKey, tt.uid)
 			req = req.WithContext(ctx)
 
 			w := httptest.NewRecorder()
@@ -753,6 +753,194 @@ func TestHandler_CreateUser(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			h.createUser(w, req)
+			assert.Equal(t, tt.status, w.Result().StatusCode)
+
+			defer func() {
+				assert.Nil(t, w.Result().Body.Close())
+			}()
+
+			if tt.assertions != nil {
+				tt.assertions(w)
+			}
+		})
+	}
+}
+
+func TestHandler_UpdateUser(t *testing.T) {
+	mock := gomock.NewController(t)
+	defer mock.Finish()
+
+	testErr := errors.New("testErr")
+	mctrl := mocks.NewMockAppCtrl(mock)
+	mauth := mocks.NewMockCore(mock)
+	h := New(mauth, mctrl)
+
+	validRequest := map[string]any{
+		"name":  "Test User",
+		"email": "test@example.com",
+	}
+
+	invalidRequest := map[string]any{
+		"email": "invalid-email",
+	}
+
+	tests := []struct {
+		name          string
+		uid           string
+		payload       any
+		withAvatar    bool
+		avatarContent []byte
+		status        int
+		expect        func()
+		assertions    func(r *httptest.ResponseRecorder)
+	}{
+		{
+			name:    "ErrFailedToParseUUID",
+			uid:     "invalid-uuid",
+			payload: validRequest,
+			status:  http.StatusUnauthorized,
+			assertions: func(r *httptest.ResponseRecorder) {
+				res := &utils.ErrorsResponse{}
+				err := json.NewDecoder(r.Result().Body).Decode(res)
+				assert.Nil(t, err)
+				assert.Equal(t, hdl.ErrFailedToParseUUID.Error(), res.Errors[0])
+			},
+		},
+		{
+			name:    "ErrDecodeRequest_InvalidForm",
+			uid:     uuid.New().String(),
+			payload: "invalid-form",
+			status:  http.StatusBadRequest,
+			assertions: func(r *httptest.ResponseRecorder) {
+				res := &utils.ErrorsResponse{}
+				err := json.NewDecoder(r.Result().Body).Decode(res)
+				assert.Nil(t, err)
+				assert.Equal(t, hdl.ErrDecodeRequest.Error(), res.Errors[0])
+			},
+		},
+		{
+			name:    "ErrValidation",
+			uid:     uuid.New().String(),
+			payload: invalidRequest,
+			status:  http.StatusBadRequest,
+			assertions: func(r *httptest.ResponseRecorder) {
+				res := &utils.ErrorsResponse{}
+				err := json.NewDecoder(r.Result().Body).Decode(res)
+				assert.Nil(t, err)
+				assert.Contains(t, res.Errors[0], "required rule")
+			},
+		},
+		{
+			name:          "ErrInvalidFileType",
+			uid:           uuid.New().String(),
+			payload:       validRequest,
+			withAvatar:    true,
+			avatarContent: []byte("not an image"),
+			status:        http.StatusBadRequest,
+			assertions: func(r *httptest.ResponseRecorder) {
+				res := &utils.ErrorsResponse{}
+				err := json.NewDecoder(r.Result().Body).Decode(res)
+				assert.Nil(t, err)
+				assert.Contains(t, res.Errors[0], "invalid file type")
+			},
+		},
+		{
+			name:    "StatusInternalServerError",
+			uid:     uuid.New().String(),
+			payload: validRequest,
+			status:  http.StatusInternalServerError,
+			assertions: func(r *httptest.ResponseRecorder) {
+				res := &utils.ErrorsResponse{}
+				err := json.NewDecoder(r.Result().Body).Decode(res)
+				assert.Nil(t, err)
+				assert.Equal(t, hdl.ErrInternal.Error(), res.Errors[0])
+			},
+			expect: func() {
+				mctrl.EXPECT().UpdateUser(
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+				).Return(testErr)
+			},
+		},
+		{
+			name:       "Success_WithoutAvatar",
+			uid:        uuid.New().String(),
+			payload:    validRequest,
+			status:     http.StatusOK,
+			assertions: func(r *httptest.ResponseRecorder) {},
+			expect: func() {
+				mctrl.EXPECT().UpdateUser(
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+			},
+		},
+		{
+			name:          "Success_WithValidImage",
+			uid:           uuid.New().String(),
+			payload:       validRequest,
+			withAvatar:    true,
+			avatarContent: []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A},
+			status:        http.StatusOK,
+			assertions:    func(r *httptest.ResponseRecorder) {},
+			expect: func() {
+				mctrl.EXPECT().UpdateUser(
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.expect != nil {
+				tt.expect()
+			}
+
+			body := &bytes.Buffer{}
+			writer := multipart.NewWriter(body)
+			jsonData, err := json.Marshal(tt.payload)
+			if err != nil {
+				writer.WriteField("data", tt.payload.(string))
+			} else {
+				writer.WriteField("data", string(jsonData))
+			}
+
+			if tt.withAvatar && tt.avatarContent != nil {
+				part, err := writer.CreateFormFile("avatar", "test.png")
+				require.NoError(t, err)
+				_, err = part.Write(tt.avatarContent)
+				require.NoError(t, err)
+			}
+
+			require.NoError(t, writer.Close())
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", tt.uid)
+
+			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/users/%s", tt.uid), body)
+			req.Header.Set("Content-Type", writer.FormDataContentType())
+
+			ctx := context.WithValue(
+				context.WithValue(
+					req.Context(),
+					chi.RouteCtxKey,
+					rctx,
+				),
+				config.UidKey,
+				tt.uid,
+			)
+			req = req.WithContext(ctx)
+
+			w := httptest.NewRecorder()
+			h.updateUser(w, req)
 			assert.Equal(t, tt.status, w.Result().StatusCode)
 
 			defer func() {

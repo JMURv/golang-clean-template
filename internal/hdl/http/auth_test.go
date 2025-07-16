@@ -215,7 +215,7 @@ func TestHandler_Authenticate(t *testing.T) {
 				res := &utils.ErrorsResponse{}
 				err := json.NewDecoder(r.Result().Body).Decode(res)
 				assert.Nil(t, err)
-				assert.Equal(t, testErr.Error(), res.Errors[0])
+				assert.Equal(t, hdl.ErrInternal.Error(), res.Errors[0])
 			},
 			expect: func() {
 				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any()).Return(true, nil)
@@ -269,8 +269,8 @@ func TestHandler_Authenticate(t *testing.T) {
 				req := httptest.NewRequest(tt.method, uri, bytes.NewBuffer(b))
 				req.Header.Set("Content-Type", "application/json")
 				if !tt.passDevice {
-					ctx := context.WithValue(req.Context(), "ip", "0.0.0.0")
-					ctx = context.WithValue(ctx, "ua", "user-agent")
+					ctx := context.WithValue(req.Context(), config.IpKey, "0.0.0.0")
+					ctx = context.WithValue(ctx, config.UaKey, "user-agent")
 					req = req.WithContext(ctx)
 				}
 
@@ -431,8 +431,8 @@ func TestHandler_Refresh(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, uri, nil)
 
 			if !tt.passDevice {
-				ctx := context.WithValue(req.Context(), "ip", "0.0.0.0")
-				ctx = context.WithValue(ctx, "ua", "user-agent")
+				ctx := context.WithValue(req.Context(), config.IpKey, "0.0.0.0")
+				ctx = context.WithValue(ctx, config.UaKey, "user-agent")
 				req = req.WithContext(ctx)
 			}
 
@@ -545,7 +545,7 @@ func TestHandler_Logout(t *testing.T) {
 
 			req := httptest.NewRequest(http.MethodPost, uri, nil)
 
-			ctx := context.WithValue(req.Context(), "uid", tt.uid)
+			ctx := context.WithValue(req.Context(), config.UidKey, tt.uid)
 			req = req.WithContext(ctx)
 
 			w := httptest.NewRecorder()
