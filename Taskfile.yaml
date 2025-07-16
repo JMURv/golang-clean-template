@@ -10,6 +10,7 @@ tasks:
       - "task mocks"
       - "task fmt"
       - "task lint"
+      - "task t"
 
   doc:
     desc: Generate docs
@@ -18,6 +19,11 @@ tasks:
       - "swag init -g ./cmd/main.go -o ./api/rest/v1 --parseDependency  --parseInternal"
 
   lint:
+    desc: Lint app
+    cmds:
+      - "golangci-lint run"
+
+  lint-fix:
     desc: Lint app
     cmds:
       - "golangci-lint run --fix"
@@ -39,6 +45,64 @@ tasks:
       - 'mockgen -source="./internal/auth/auth.go" -destination="tests/mocks/mock_auth.go" -package=mocks'
   # END
 
+  # DOCKER
+  dc-prod:
+    desc: Run prod compose
+    cmds:
+      - "docker compose --env-file {{.PROD_ENV_FILE}} -f {{.PROD_DOCKER_COMPOSE_PATH}} up --watch"
+
+  dc-prod-build:
+    desc: Run prod compose
+    cmds:
+      - "docker compose --env-file {{.PROD_ENV_FILE}} -f {{.PROD_DOCKER_COMPOSE_PATH}} up --build --watch"
+
+  dc-prod-down:
+    desc: Shutdown prod compose
+    cmds:
+      - "docker compose --env-file {{.PROD_ENV_FILE}} -f {{.PROD_DOCKER_COMPOSE_PATH}} down"
+
+  dc-dev:
+    desc: Run dev compose
+    cmds:
+      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} up --watch"
+
+  dc-dev-build:
+    desc: Run dev compose
+    cmds:
+      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} up --build --watch"
+
+  dc-dev-down:
+    desc: Shutdown dev compose
+    cmds:
+      - "docker compose --env-file {{.DEV_ENV_FILE}} -f {{.DEV_DOCKER_COMPOSE_PATH}} down"
+
+  dc-test:
+    desc: Run integration tests helper containers
+    cmds:
+      - "docker compose --env-file {{.TEST_ENV_FILE}} -f {{.TEST_DOCKER_COMPOSE_PATH}} up"
+
+  dc-test-down:
+    desc: Shutdown integration tests helper containers
+    cmds:
+      - "docker compose -f {{.TEST_DOCKER_COMPOSE_PATH}} down"
+  # END
+
+  # K8s
+  k-up:
+    desc: Run k8s manifests
+    cmds:
+      - "kubectl apply -f build/k8s/cfg/cfg.yaml"
+      - "kubectl apply -f build/k8s/cfg/secret.yaml"
+      - "kubectl apply -f build/k8s/deploy.yaml"
+
+  k-down:
+    desc: Remove k8s manifests
+    cmds:
+      - "kubectl delete -f build/k8s/cfg/cfg.yaml"
+      - "kubectl delete -f build/k8s/cfg/secret.yaml"
+      - "kubectl delete -f build/k8s/deploy.yaml"
+  # END
+
   # TESTS
   t:
     desc: Run tests
@@ -57,29 +121,29 @@ tasks:
   t-http:
     desc: Test http handlers
     cmds:
-      - "go test ./internal/hdl/http"
+      - "go test ./internal/hdl/http -v"
       - "go test -coverprofile=cov_http.out ./internal/hdl/http && go tool cover -func=cov_http.out"
 
   t-grpc:
     desc: Test grpc handlers
     cmds:
-      - "go test ./internal/hdl/grpc"
+      - "go test ./internal/hdl/grpc -v"
       - "go test -coverprofile=cov_grpc.out ./internal/hdl/grpc && go tool cover -func=cov_grpc.out"
 
   t-ctrl:
     desc: Run ctrl tests
     cmds:
-      - "go test ./internal/ctrl"
+      - "go test ./internal/ctrl -v"
       - "go test -coverprofile=cov_ctrl.out ./internal/ctrl && go tool cover -func=cov_ctrl.out"
 
   t-repo:
     desc: Run repo tests
     cmds:
-      - "go test ./internal/repo/db"
+      - "go test ./internal/repo/db -v"
       - "go test -coverprofile=cov_repo.out ./internal/repo/db && go tool cover -func=cov_repo.out"
 
   t-integration:
     desc: Run integration tests
     cmds:
-      - "go test -v ./tests/integration/..."
+      - "go test ./tests/integration/... -v"
   # END

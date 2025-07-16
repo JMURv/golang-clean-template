@@ -1,7 +1,10 @@
 package smtp
 
 import (
+	"context"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 	"gopkg.in/gomail.v2"
 )
@@ -26,7 +29,7 @@ func New(conf config.Config) *EmailServer {
 	}
 }
 
-func (s *EmailServer) GetMessageBase(subject string, toEmail string) *gomail.Message {
+func (s *EmailServer) GetMessageBase(subject, toEmail string) *gomail.Message {
 	m := gomail.NewMessage()
 	m.SetHeader("From", s.user)
 	m.SetHeader("To", toEmail)
@@ -34,9 +37,12 @@ func (s *EmailServer) GetMessageBase(subject string, toEmail string) *gomail.Mes
 	return m
 }
 
-func (s *EmailServer) Send(m *gomail.Message) error {
+func (s *EmailServer) Send(ctx context.Context, m *gomail.Message) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "smtp.GetMessageBase")
+
 	d := gomail.NewDialer(s.server, s.port, s.user, s.pass)
 	if err := d.DialAndSend(m); err != nil {
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"Failed to send an email",
 			zap.Error(err),

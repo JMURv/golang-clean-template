@@ -6,4 +6,5 @@ var (
 	ErrMethodNotAllowed = errors.New("method not allowed")
 	ErrInvalidURL       = errors.New("invalid URL")
 	ErrRetrievePathVars = errors.New("cannot retrieve path variables")
+	ErrNoDeviceInfo     = errors.New("no device info provided")
 )

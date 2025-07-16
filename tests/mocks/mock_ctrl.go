@@ -14,7 +14,10 @@ import (
 	reflect "reflect"
 	time "time"
 
+	dto "github.com/JMURv/golang-clean-template/internal/dto"
+	models "github.com/JMURv/golang-clean-template/internal/models"
 	s3 "github.com/JMURv/golang-clean-template/internal/repo/s3"
+	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,6 +45,239 @@ func (m *MockAppRepo) EXPECT() *MockAppRepoMockRecorder {
 	return m.recorder
 }
 
+// CreateToken mocks base method.
+func (m *MockAppRepo) CreateToken(ctx context.Context, userID uuid.UUID, hashedT string, expiresAt time.Time, device *models.Device) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateToken", ctx, userID, hashedT, expiresAt, device)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateToken indicates an expected call of CreateToken.
+func (mr *MockAppRepoMockRecorder) CreateToken(ctx, userID, hashedT, expiresAt, device any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateToken", reflect.TypeOf((*MockAppRepo)(nil).CreateToken), ctx, userID, hashedT, expiresAt, device)
+}
+
+// CreateUser mocks base method.
+func (m *MockAppRepo) CreateUser(ctx context.Context, req *dto.CreateUserRequest) (uuid.UUID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", ctx, req)
+	ret0, _ := ret[0].(uuid.UUID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockAppRepoMockRecorder) CreateUser(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockAppRepo)(nil).CreateUser), ctx, req)
+}
+
+// DeleteDevice mocks base method.
+func (m *MockAppRepo) DeleteDevice(ctx context.Context, uid uuid.UUID, deviceID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDevice", ctx, uid, deviceID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteDevice indicates an expected call of DeleteDevice.
+func (mr *MockAppRepoMockRecorder) DeleteDevice(ctx, uid, deviceID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDevice", reflect.TypeOf((*MockAppRepo)(nil).DeleteDevice), ctx, uid, deviceID)
+}
+
+// DeleteUser mocks base method.
+func (m *MockAppRepo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUser", ctx, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUser indicates an expected call of DeleteUser.
+func (mr *MockAppRepoMockRecorder) DeleteUser(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockAppRepo)(nil).DeleteUser), ctx, userID)
+}
+
+// GetByDevice mocks base method.
+func (m *MockAppRepo) GetByDevice(ctx context.Context, userID uuid.UUID, deviceID string) (*models.RefreshToken, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByDevice", ctx, userID, deviceID)
+	ret0, _ := ret[0].(*models.RefreshToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByDevice indicates an expected call of GetByDevice.
+func (mr *MockAppRepoMockRecorder) GetByDevice(ctx, userID, deviceID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByDevice", reflect.TypeOf((*MockAppRepo)(nil).GetByDevice), ctx, userID, deviceID)
+}
+
+// GetDevice mocks base method.
+func (m *MockAppRepo) GetDevice(ctx context.Context, uid uuid.UUID, dID string) (*models.Device, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDevice", ctx, uid, dID)
+	ret0, _ := ret[0].(*models.Device)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDevice indicates an expected call of GetDevice.
+func (mr *MockAppRepoMockRecorder) GetDevice(ctx, uid, dID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDevice", reflect.TypeOf((*MockAppRepo)(nil).GetDevice), ctx, uid, dID)
+}
+
+// GetDeviceByID mocks base method.
+func (m *MockAppRepo) GetDeviceByID(ctx context.Context, dID string) (*models.Device, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDeviceByID", ctx, dID)
+	ret0, _ := ret[0].(*models.Device)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDeviceByID indicates an expected call of GetDeviceByID.
+func (mr *MockAppRepoMockRecorder) GetDeviceByID(ctx, dID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDeviceByID", reflect.TypeOf((*MockAppRepo)(nil).GetDeviceByID), ctx, dID)
+}
+
+// GetUserByEmail mocks base method.
+func (m *MockAppRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByEmail", ctx, email)
+	ret0, _ := ret[0].(*models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserByEmail indicates an expected call of GetUserByEmail.
+func (mr *MockAppRepoMockRecorder) GetUserByEmail(ctx, email any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByEmail", reflect.TypeOf((*MockAppRepo)(nil).GetUserByEmail), ctx, email)
+}
+
+// GetUserByID mocks base method.
+func (m *MockAppRepo) GetUserByID(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByID", ctx, userID)
+	ret0, _ := ret[0].(*models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserByID indicates an expected call of GetUserByID.
+func (mr *MockAppRepoMockRecorder) GetUserByID(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockAppRepo)(nil).GetUserByID), ctx, userID)
+}
+
+// IsTokenValid mocks base method.
+func (m *MockAppRepo) IsTokenValid(ctx context.Context, userID uuid.UUID, d *models.Device, token string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsTokenValid", ctx, userID, d, token)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsTokenValid indicates an expected call of IsTokenValid.
+func (mr *MockAppRepoMockRecorder) IsTokenValid(ctx, userID, d, token any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsTokenValid", reflect.TypeOf((*MockAppRepo)(nil).IsTokenValid), ctx, userID, d, token)
+}
+
+// ListDevices mocks base method.
+func (m *MockAppRepo) ListDevices(ctx context.Context, uid uuid.UUID) ([]models.Device, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListDevices", ctx, uid)
+	ret0, _ := ret[0].([]models.Device)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListDevices indicates an expected call of ListDevices.
+func (mr *MockAppRepoMockRecorder) ListDevices(ctx, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDevices", reflect.TypeOf((*MockAppRepo)(nil).ListDevices), ctx, uid)
+}
+
+// ListUsers mocks base method.
+func (m *MockAppRepo) ListUsers(ctx context.Context, page, size int, filters map[string]any) (*dto.PaginatedUserResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListUsers", ctx, page, size, filters)
+	ret0, _ := ret[0].(*dto.PaginatedUserResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListUsers indicates an expected call of ListUsers.
+func (mr *MockAppRepoMockRecorder) ListUsers(ctx, page, size, filters any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUsers", reflect.TypeOf((*MockAppRepo)(nil).ListUsers), ctx, page, size, filters)
+}
+
+// RevokeAllTokens mocks base method.
+func (m *MockAppRepo) RevokeAllTokens(ctx context.Context, userID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokeAllTokens", ctx, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RevokeAllTokens indicates an expected call of RevokeAllTokens.
+func (mr *MockAppRepoMockRecorder) RevokeAllTokens(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeAllTokens", reflect.TypeOf((*MockAppRepo)(nil).RevokeAllTokens), ctx, userID)
+}
+
+// RevokeByDevice mocks base method.
+func (m *MockAppRepo) RevokeByDevice(ctx context.Context, userID uuid.UUID, deviceID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokeByDevice", ctx, userID, deviceID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RevokeByDevice indicates an expected call of RevokeByDevice.
+func (mr *MockAppRepoMockRecorder) RevokeByDevice(ctx, userID, deviceID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeByDevice", reflect.TypeOf((*MockAppRepo)(nil).RevokeByDevice), ctx, userID, deviceID)
+}
+
+// UpdateDevice mocks base method.
+func (m *MockAppRepo) UpdateDevice(ctx context.Context, uid uuid.UUID, dID string, req *dto.UpdateDeviceRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDevice", ctx, uid, dID, req)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateDevice indicates an expected call of UpdateDevice.
+func (mr *MockAppRepoMockRecorder) UpdateDevice(ctx, uid, dID, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDevice", reflect.TypeOf((*MockAppRepo)(nil).UpdateDevice), ctx, uid, dID, req)
+}
+
+// UpdateUser mocks base method.
+func (m *MockAppRepo) UpdateUser(ctx context.Context, id uuid.UUID, req *dto.UpdateUserRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUser", ctx, id, req)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUser indicates an expected call of UpdateUser.
+func (mr *MockAppRepoMockRecorder) UpdateUser(ctx, id, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockAppRepo)(nil).UpdateUser), ctx, id, req)
+}
+
 // MockAppCtrl is a mock of AppCtrl interface.
 type MockAppCtrl struct {
 	ctrl     *gomock.Controller
@@ -64,6 +300,241 @@ func NewMockAppCtrl(ctrl *gomock.Controller) *MockAppCtrl {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockAppCtrl) EXPECT() *MockAppCtrlMockRecorder {
 	return m.recorder
+}
+
+// Authenticate mocks base method.
+func (m *MockAppCtrl) Authenticate(ctx context.Context, d *dto.DeviceRequest, req *dto.EmailAndPasswordRequest) (*dto.TokenPair, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Authenticate", ctx, d, req)
+	ret0, _ := ret[0].(*dto.TokenPair)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Authenticate indicates an expected call of Authenticate.
+func (mr *MockAppCtrlMockRecorder) Authenticate(ctx, d, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authenticate", reflect.TypeOf((*MockAppCtrl)(nil).Authenticate), ctx, d, req)
+}
+
+// CreateUser mocks base method.
+func (m *MockAppCtrl) CreateUser(ctx context.Context, u *dto.CreateUserRequest, file *s3.UploadFileRequest) (*dto.CreateUserResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", ctx, u, file)
+	ret0, _ := ret[0].(*dto.CreateUserResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockAppCtrlMockRecorder) CreateUser(ctx, u, file any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockAppCtrl)(nil).CreateUser), ctx, u, file)
+}
+
+// DeleteDevice mocks base method.
+func (m *MockAppCtrl) DeleteDevice(ctx context.Context, uid uuid.UUID, dID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDevice", ctx, uid, dID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteDevice indicates an expected call of DeleteDevice.
+func (mr *MockAppCtrlMockRecorder) DeleteDevice(ctx, uid, dID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDevice", reflect.TypeOf((*MockAppCtrl)(nil).DeleteDevice), ctx, uid, dID)
+}
+
+// DeleteUser mocks base method.
+func (m *MockAppCtrl) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUser", ctx, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUser indicates an expected call of DeleteUser.
+func (mr *MockAppCtrlMockRecorder) DeleteUser(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockAppCtrl)(nil).DeleteUser), ctx, userID)
+}
+
+// GenPair mocks base method.
+func (m *MockAppCtrl) GenPair(ctx context.Context, d *dto.DeviceRequest, uid uuid.UUID) (dto.TokenPair, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenPair", ctx, d, uid)
+	ret0, _ := ret[0].(dto.TokenPair)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GenPair indicates an expected call of GenPair.
+func (mr *MockAppCtrlMockRecorder) GenPair(ctx, d, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenPair", reflect.TypeOf((*MockAppCtrl)(nil).GenPair), ctx, d, uid)
+}
+
+// GetDevice mocks base method.
+func (m *MockAppCtrl) GetDevice(ctx context.Context, uid uuid.UUID, dID string) (*models.Device, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDevice", ctx, uid, dID)
+	ret0, _ := ret[0].(*models.Device)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDevice indicates an expected call of GetDevice.
+func (mr *MockAppCtrlMockRecorder) GetDevice(ctx, uid, dID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDevice", reflect.TypeOf((*MockAppCtrl)(nil).GetDevice), ctx, uid, dID)
+}
+
+// GetDeviceByID mocks base method.
+func (m *MockAppCtrl) GetDeviceByID(ctx context.Context, dID string) (*models.Device, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDeviceByID", ctx, dID)
+	ret0, _ := ret[0].(*models.Device)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDeviceByID indicates an expected call of GetDeviceByID.
+func (mr *MockAppCtrlMockRecorder) GetDeviceByID(ctx, dID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDeviceByID", reflect.TypeOf((*MockAppCtrl)(nil).GetDeviceByID), ctx, dID)
+}
+
+// GetUserByEmail mocks base method.
+func (m *MockAppCtrl) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByEmail", ctx, email)
+	ret0, _ := ret[0].(*models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserByEmail indicates an expected call of GetUserByEmail.
+func (mr *MockAppCtrlMockRecorder) GetUserByEmail(ctx, email any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByEmail", reflect.TypeOf((*MockAppCtrl)(nil).GetUserByEmail), ctx, email)
+}
+
+// GetUserByID mocks base method.
+func (m *MockAppCtrl) GetUserByID(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByID", ctx, userID)
+	ret0, _ := ret[0].(*models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserByID indicates an expected call of GetUserByID.
+func (mr *MockAppCtrlMockRecorder) GetUserByID(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockAppCtrl)(nil).GetUserByID), ctx, userID)
+}
+
+// IsUserExist mocks base method.
+func (m *MockAppCtrl) IsUserExist(ctx context.Context, email string) (*dto.ExistsUserResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsUserExist", ctx, email)
+	ret0, _ := ret[0].(*dto.ExistsUserResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsUserExist indicates an expected call of IsUserExist.
+func (mr *MockAppCtrlMockRecorder) IsUserExist(ctx, email any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserExist", reflect.TypeOf((*MockAppCtrl)(nil).IsUserExist), ctx, email)
+}
+
+// ListDevices mocks base method.
+func (m *MockAppCtrl) ListDevices(ctx context.Context, uid uuid.UUID) ([]models.Device, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListDevices", ctx, uid)
+	ret0, _ := ret[0].([]models.Device)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListDevices indicates an expected call of ListDevices.
+func (mr *MockAppCtrlMockRecorder) ListDevices(ctx, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDevices", reflect.TypeOf((*MockAppCtrl)(nil).ListDevices), ctx, uid)
+}
+
+// ListUsers mocks base method.
+func (m *MockAppCtrl) ListUsers(ctx context.Context, page, size int, filters map[string]any) (*dto.PaginatedUserResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListUsers", ctx, page, size, filters)
+	ret0, _ := ret[0].(*dto.PaginatedUserResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListUsers indicates an expected call of ListUsers.
+func (mr *MockAppCtrlMockRecorder) ListUsers(ctx, page, size, filters any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUsers", reflect.TypeOf((*MockAppCtrl)(nil).ListUsers), ctx, page, size, filters)
+}
+
+// Logout mocks base method.
+func (m *MockAppCtrl) Logout(ctx context.Context, uid uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Logout", ctx, uid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Logout indicates an expected call of Logout.
+func (mr *MockAppCtrlMockRecorder) Logout(ctx, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logout", reflect.TypeOf((*MockAppCtrl)(nil).Logout), ctx, uid)
+}
+
+// Refresh mocks base method.
+func (m *MockAppCtrl) Refresh(ctx context.Context, d *dto.DeviceRequest, req *dto.RefreshRequest) (*dto.TokenPair, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Refresh", ctx, d, req)
+	ret0, _ := ret[0].(*dto.TokenPair)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Refresh indicates an expected call of Refresh.
+func (mr *MockAppCtrlMockRecorder) Refresh(ctx, d, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Refresh", reflect.TypeOf((*MockAppCtrl)(nil).Refresh), ctx, d, req)
+}
+
+// UpdateDevice mocks base method.
+func (m *MockAppCtrl) UpdateDevice(ctx context.Context, uid uuid.UUID, dID string, req *dto.UpdateDeviceRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDevice", ctx, uid, dID, req)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateDevice indicates an expected call of UpdateDevice.
+func (mr *MockAppCtrlMockRecorder) UpdateDevice(ctx, uid, dID, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDevice", reflect.TypeOf((*MockAppCtrl)(nil).UpdateDevice), ctx, uid, dID, req)
+}
+
+// UpdateUser mocks base method.
+func (m *MockAppCtrl) UpdateUser(ctx context.Context, id uuid.UUID, req *dto.UpdateUserRequest, file *s3.UploadFileRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUser", ctx, id, req, file)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUser indicates an expected call of UpdateUser.
+func (mr *MockAppCtrlMockRecorder) UpdateUser(ctx, id, req, file any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockAppCtrl)(nil).UpdateUser), ctx, id, req, file)
 }
 
 // MockS3Service is a mock of S3Service interface.
@@ -130,17 +601,17 @@ func (m *MockCacheService) EXPECT() *MockCacheServiceMockRecorder {
 }
 
 // Close mocks base method.
-func (m *MockCacheService) Close() error {
+func (m *MockCacheService) Close(ctx context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Close")
+	ret := m.ctrl.Call(m, "Close", ctx)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockCacheServiceMockRecorder) Close() *gomock.Call {
+func (mr *MockCacheServiceMockRecorder) Close(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockCacheService)(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockCacheService)(nil).Close), ctx)
 }
 
 // Delete mocks base method.
@@ -191,28 +662,4 @@ func (m *MockCacheService) Set(ctx context.Context, t time.Duration, key string,
 func (mr *MockCacheServiceMockRecorder) Set(ctx, t, key, val any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockCacheService)(nil).Set), ctx, t, key, val)
-}
-
-// MockEmailService is a mock of EmailService interface.
-type MockEmailService struct {
-	ctrl     *gomock.Controller
-	recorder *MockEmailServiceMockRecorder
-	isgomock struct{}
-}
-
-// MockEmailServiceMockRecorder is the mock recorder for MockEmailService.
-type MockEmailServiceMockRecorder struct {
-	mock *MockEmailService
-}
-
-// NewMockEmailService creates a new mock instance.
-func NewMockEmailService(ctrl *gomock.Controller) *MockEmailService {
-	mock := &MockEmailService{ctrl: ctrl}
-	mock.recorder = &MockEmailServiceMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockEmailService) EXPECT() *MockEmailServiceMockRecorder {
-	return m.recorder
 }

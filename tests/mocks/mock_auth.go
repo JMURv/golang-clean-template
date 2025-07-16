@@ -103,18 +103,18 @@ func (mr *MockCoreMockRecorder) GetRefreshTime() *gomock.Call {
 }
 
 // Hash mocks base method.
-func (m *MockCore) Hash(pswd string) (string, error) {
+func (m *MockCore) Hash(ctx context.Context, pswd string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Hash", pswd)
+	ret := m.ctrl.Call(m, "Hash", ctx, pswd)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Hash indicates an expected call of Hash.
-func (mr *MockCoreMockRecorder) Hash(pswd any) *gomock.Call {
+func (mr *MockCoreMockRecorder) Hash(ctx, pswd any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockCore)(nil).Hash), pswd)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockCore)(nil).Hash), ctx, pswd)
 }
 
 // NewToken mocks base method.
@@ -148,16 +148,16 @@ func (mr *MockCoreMockRecorder) ParseClaims(ctx, tokenStr any) *gomock.Call {
 }
 
 // VerifyRecaptcha mocks base method.
-func (m *MockCore) VerifyRecaptcha(token string, action captcha.Actions) (bool, error) {
+func (m *MockCore) VerifyRecaptcha(ctx context.Context, token string, action captcha.Actions) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "VerifyRecaptcha", token, action)
+	ret := m.ctrl.Call(m, "VerifyRecaptcha", ctx, token, action)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // VerifyRecaptcha indicates an expected call of VerifyRecaptcha.
-func (mr *MockCoreMockRecorder) VerifyRecaptcha(token, action any) *gomock.Call {
+func (mr *MockCoreMockRecorder) VerifyRecaptcha(ctx, token, action any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyRecaptcha", reflect.TypeOf((*MockCore)(nil).VerifyRecaptcha), token, action)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyRecaptcha", reflect.TypeOf((*MockCore)(nil).VerifyRecaptcha), ctx, token, action)
 }

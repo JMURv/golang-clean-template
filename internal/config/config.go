@@ -34,6 +34,7 @@ type authConfig struct {
 		Issuer string `env:"JWT_ISSUER,required"`
 	}
 	Captcha struct {
+		Enabled bool   `env:"CAPTCHA_ENABLED" envDefault:"false"`
 		SiteKey string `env:"CAPTCHA_SITE_KEY"`
 		Secret  string `env:"CAPTCHA_SECRET"`
 	}
@@ -56,11 +57,11 @@ type dbConfig struct {
 }
 
 type s3Config struct {
-	Addr      string `env:"MINIO_ADDR"       envDefault:"localhost:9000"`
-	AccessKey string `env:"MINIO_ACCESS_KEY" envDefault:""`
-	SecretKey string `env:"MINIO_SECRET_KEY" envDefault:""`
-	Bucket    string `env:"MINIO_BUCKET"     envDefault:"app"`
-	UseSSL    bool   `env:"MINIO_SSL"        envDefault:"false"`
+	Addr      string `env:"MINIO_ADDR"          envDefault:"localhost:9000"`
+	AccessKey string `env:"MINIO_ROOT_USER"     envDefault:""`
+	SecretKey string `env:"MINIO_ROOT_PASSWORD" envDefault:""`
+	Bucket    string `env:"MINIO_BUCKET"        envDefault:"app-template"`
+	UseSSL    bool   `env:"MINIO_SSL"           envDefault:"false"`
 }
 
 type redisConfig struct {
@@ -94,7 +95,7 @@ func MustLoad(path string) Config {
 	if err := env.Parse(&conf); err != nil {
 		panic("failed to parse environment variables: " + err.Error())
 	}
-	log.Println("Load configuration from environment")
 
+	log.Println("Load configuration from environment")
 	return conf
 }

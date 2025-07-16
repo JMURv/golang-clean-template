@@ -12,7 +12,8 @@ bin/*
 # configs
 .env*
 !.env.example
-!.env.test
+!.env.integration
+!.env.k6
 
 # k8s
 cfg.yaml

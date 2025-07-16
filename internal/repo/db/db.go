@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/JMURv/golang-clean-template/internal/config"
@@ -41,6 +42,16 @@ func New(config config.Config) *Repository {
 	return &Repository{conn: conn}
 }
 
-func (r *Repository) Close() error {
-	return r.conn.Close()
+func (r *Repository) Close(ctx context.Context) error {
+	done := make(chan error, 1)
+	go func() {
+		done <- r.conn.Close()
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-done:
+		return err
+	}
 }

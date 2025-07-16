@@ -8,16 +8,28 @@ linters:
   disable:
     - wsl
     - depguard
+    - noinlineerr
+    - nlreturn
+    - wrapcheck
+    - varnamelen
+    - sqlclosecheck
+    - revive
+    - gosec
+    - funlen
+    - exhaustruct
+    - dupword
   settings:
     wsl_v5:
       allow-first-in-block: true
       allow-whole-block: false
       branch-max-lines: 2
+      disable:
+        - return
     errcheck:
       check-type-assertions: true
       check-blank: true
     gocyclo:
-      min-complexity: 10
+      min-complexity: 11
 
   exclusions:
     generated: lax

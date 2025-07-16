@@ -42,7 +42,7 @@ func New(port int) *Metric {
 	}
 }
 
-func (m *Metric) Start(ctx context.Context) {
+func (m *Metric) Start() {
 	m.reg.MustRegister(
 		SrvMetrics,
 		RequestMetrics,
@@ -61,18 +61,24 @@ func (m *Metric) Start(ctx context.Context) {
 	)
 
 	m.srv.Handler = mux
-	go func() {
-		if err := m.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			zap.L().Error("Prometheus server has been stopped with error", zap.Error(err))
-		}
-	}()
 	zap.L().Info("Prometheus server has been started", zap.String("addr", m.srv.Addr))
-
-	<-ctx.Done()
-	if err := m.srv.Shutdown(ctx); err != nil {
-		zap.L().Error("Prometheus server shutdown failed", zap.Error(err))
+	if err := m.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		zap.L().Error("Prometheus server has been stopped with error", zap.Error(err))
 	}
-	zap.L().Info("Prometheus server has been stopped")
+}
+
+func (m *Metric) Close(ctx context.Context) error {
+	done := make(chan error, 1)
+	go func() {
+		done <- m.srv.Shutdown(ctx)
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-done:
+		return err
+	}
 }
 
 var RequestMetrics = promauto.NewSummaryVec(

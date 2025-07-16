@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	metrics "github.com/JMURv/golang-clean-template/internal/observability/metrics/prometheus"
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
@@ -37,8 +38,7 @@ func Auth(au auth.Core) grpc.UnaryServerInterceptor {
 			return handler(ctx, req)
 		}
 
-		ctx = context.WithValue(ctx, "uid", claims.UID)
-
+		ctx = context.WithValue(ctx, config.UidKey, claims.UID)
 		return handler(ctx, req)
 	}
 }

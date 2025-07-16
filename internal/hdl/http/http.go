@@ -19,7 +19,7 @@ import (
 )
 
 type Handler struct {
-	router *chi.Mux
+	Router *chi.Mux
 	au     auth.Core
 	srv    *http.Server
 	ctrl   ctrl.AppCtrl
@@ -27,15 +27,7 @@ type Handler struct {
 
 func New(au auth.Core, ctrl ctrl.AppCtrl) *Handler {
 	r := chi.NewRouter()
-	return &Handler{
-		router: r,
-		au:     au,
-		ctrl:   ctrl,
-	}
-}
-
-func (h *Handler) Start(port int) {
-	h.router.Use(
+	r.Use(
 		mid.Logger(zap.L()),
 		middleware.StripSlashes,
 		middleware.RequestID,
@@ -45,16 +37,27 @@ func (h *Handler) Start(port int) {
 		mid.OT,
 	)
 
-	h.RegisterRoutes()
-	h.router.Get("/swagger/*", httpSwagger.WrapHandler)
-	h.router.Get(
+	hdl := &Handler{
+		Router: r,
+		au:     au,
+		ctrl:   ctrl,
+	}
+
+	hdl.RegisterAuthRoutes()
+	hdl.RegisterUserRoutes()
+	hdl.RegisterDeviceRoutes()
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
+	r.Get(
 		"/health", func(w http.ResponseWriter, r *http.Request) {
 			utils.SuccessResponse(w, http.StatusOK, "OK")
 		},
 	)
+	return hdl
+}
 
+func (h *Handler) Start(port int) {
 	h.srv = &http.Server{
-		Handler:      h.router,
+		Handler:      h.Router,
 		Addr:         fmt.Sprintf(":%v", port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -73,5 +76,15 @@ func (h *Handler) Start(port int) {
 }
 
 func (h *Handler) Close(ctx context.Context) error {
-	return h.srv.Shutdown(ctx)
+	done := make(chan error, 1)
+	go func() {
+		done <- h.srv.Shutdown(ctx)
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-done:
+		return err
+	}
 }

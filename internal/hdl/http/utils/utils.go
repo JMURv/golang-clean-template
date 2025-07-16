@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"encoding/json"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -12,10 +12,13 @@ import (
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/config"
+	"github.com/JMURv/golang-clean-template/internal/dto"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	"github.com/JMURv/golang-clean-template/internal/hdl/validation"
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 	"github.com/go-playground/validator/v10"
+	"github.com/goccy/go-json"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -34,7 +37,6 @@ func SuccessResponse(w http.ResponseWriter, statusCode int, data any) {
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		zap.L().Error("failed to encode success response", zap.Error(err))
-
 		return
 	}
 }
@@ -77,6 +79,21 @@ func ParsePaginationValues(r *http.Request) (int, int) {
 	return page, size
 }
 
+func ParseFiltersByURL(r *http.Request) map[string]any {
+	filters := make(map[string]any, len(r.URL.Query()))
+	for key, values := range r.URL.Query() {
+		switch key {
+		case "page", "size":
+			continue
+		case "sort":
+			filters[key] = values[0]
+		default:
+			filters[key] = values[0]
+		}
+	}
+	return filters
+}
+
 func ParseAndValidate(w http.ResponseWriter, r *http.Request, dst any) bool {
 	var err error
 	if err = json.NewDecoder(r.Body).Decode(dst); err != nil {
@@ -90,15 +107,34 @@ func ParseAndValidate(w http.ResponseWriter, r *http.Request, dst any) bool {
 	}
 
 	if err = validation.V.Struct(dst); err != nil {
+		zap.L().Debug("failed to validate request", zap.Error(err))
 		ErrResponse(w, http.StatusBadRequest, err)
-
 		return false
 	}
 
 	return true
 }
 
-func GetAuthCookies(accessStr string, refreshStr string) (*http.Cookie, *http.Cookie) {
+func ParseDeviceByRequest(ctx context.Context) (dto.DeviceRequest, bool) {
+	ip, ok := ctx.Value(config.IpKey).(string)
+	if !ok {
+		zap.L().Debug("failed to parse ip from request")
+		return dto.DeviceRequest{}, false
+	}
+
+	ua, ok := ctx.Value(config.UaKey).(string)
+	if !ok {
+		zap.L().Debug("failed to parse user-agent from request")
+		return dto.DeviceRequest{}, false
+	}
+
+	return dto.DeviceRequest{
+		IP: ip,
+		UA: ua,
+	}, true
+}
+
+func GetAuthCookies(accessStr, refreshStr string) (*http.Cookie, *http.Cookie) {
 	access := &http.Cookie{
 		Name:     config.AccessCookieName,
 		Value:    accessStr,
@@ -135,6 +171,9 @@ var (
 )
 
 func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileRequest) error {
+	span, _ := opentracing.StartSpanFromContext(r.Context(), "ParseFileField")
+	defer span.Finish()
+
 	file, header, err := r.FormFile(fieldName)
 	if err != nil && !errors.Is(err, http.ErrMissingFile) {
 		return ErrInvalidFileUpload
@@ -143,11 +182,12 @@ func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileReq
 	if header != nil {
 		defer func(file multipart.File) {
 			if err = file.Close(); err != nil {
+				span.SetTag(config.ErrorSpanTag, true)
 				zap.L().Error("failed to close file", zap.Error(err))
 			}
 		}(file)
 
-		if header.Size > 10<<20 {
+		if header.Size > config.MaxMemory {
 			zap.L().Debug(
 				"file too large",
 				zap.String("field", fieldName),
@@ -158,6 +198,7 @@ func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileReq
 
 		fileReq.File, err = io.ReadAll(file)
 		if err != nil {
+			span.SetTag(config.ErrorSpanTag, true)
 			zap.L().Error("failed to read file", zap.Error(err))
 			return hdl.ErrInternal
 		}

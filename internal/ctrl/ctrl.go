@@ -2,23 +2,30 @@ package ctrl
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 )
 
-type AppRepo any
+type AppRepo interface {
+	authRepo
+	deviceRepo
+	userRepo
+}
 
-type AppCtrl any
+type AppCtrl interface {
+	authCtrl
+	deviceCtrl
+	userCtrl
+}
 
 type S3Service interface {
 	UploadFile(ctx context.Context, req *s3.UploadFileRequest) (string, error)
 }
 
 type CacheService interface {
-	io.Closer
+	Close(ctx context.Context) error
 	GetToStruct(ctx context.Context, key string, dest any) error
 	Set(ctx context.Context, t time.Duration, key string, val any)
 	Delete(ctx context.Context, key string)
