@@ -2,10 +2,10 @@ package interceptors
 
 import (
 	"context"
-	"github.com/JMURv/golang-clean-template/internal/config"
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
+	"github.com/JMURv/golang-clean-template/internal/config"
 	metrics "github.com/JMURv/golang-clean-template/internal/observability/metrics/prometheus"
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"

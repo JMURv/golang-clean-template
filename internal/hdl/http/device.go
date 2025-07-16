@@ -2,9 +2,9 @@ package http
 
 import (
 	"errors"
-	"github.com/JMURv/golang-clean-template/internal/config"
 	"net/http"
 
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/dto"
 	"github.com/JMURv/golang-clean-template/internal/hdl"

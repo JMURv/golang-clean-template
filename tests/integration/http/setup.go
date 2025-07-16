@@ -3,6 +3,14 @@ package http
 import (
 	"context"
 	"fmt"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/cache/redis"
 	"github.com/JMURv/golang-clean-template/internal/config"
@@ -17,13 +25,6 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"go.uber.org/zap"
-	"net/http/httptest"
-	"os"
-	"path/filepath"
-	"strings"
-	"sync"
-	"testing"
-	"time"
 )
 
 const getTables = `
@@ -36,9 +37,11 @@ var rootDir = filepath.Join("..", "..", "..")
 
 var conf config.Config
 
-var redisC testcontainers.Container
-var minioC testcontainers.Container
-var pgC testcontainers.Container
+var (
+	redisC testcontainers.Container
+	minioC testcontainers.Container
+	pgC    testcontainers.Container
+)
 
 func getRedis() testcontainers.Container {
 	ctx := context.Background()
@@ -80,7 +83,14 @@ func getPostgres() testcontainers.Container {
 		ExposedPorts: []string{pgPortC},
 		ConfigModifier: func(conf *container.Config) {
 			conf.Healthcheck = &container.HealthConfig{
-				Test:        []string{"CMD-SHELL", fmt.Sprintf("pg_isready -U %s -d %s", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_DB"))},
+				Test: []string{
+					"CMD-SHELL",
+					fmt.Sprintf(
+						"pg_isready -U %s -d %s",
+						os.Getenv("POSTGRES_USER"),
+						os.Getenv("POSTGRES_DB"),
+					),
+				},
 				Interval:    5 * time.Second,
 				Timeout:     2 * time.Second,
 				Retries:     5,
@@ -213,7 +223,10 @@ func setupTestServer() (*httptest.Server, func(t *testing.T)) {
 			return
 		}
 
-		_, err = conn.Exec(ctx, fmt.Sprintf("TRUNCATE TABLE %v RESTART IDENTITY CASCADE;", strings.Join(tables, ", ")))
+		_, err = conn.Exec(
+			ctx,
+			fmt.Sprintf("TRUNCATE TABLE %v RESTART IDENTITY CASCADE;", strings.Join(tables, ", ")),
+		)
 		if err != nil {
 			zap.L().Fatal("Failed to truncate tables", zap.Error(err))
 		}

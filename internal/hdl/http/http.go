@@ -37,7 +37,6 @@ func New(au auth.Core, ctrl ctrl.AppCtrl) *Handler {
 		mid.OT,
 	)
 
-
 	hdl := &Handler{
 		Router: r,
 		au:     au,

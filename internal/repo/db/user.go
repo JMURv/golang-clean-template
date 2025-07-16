@@ -25,8 +25,14 @@ func (r *Repository) ListUsers(
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
 	defer span.Finish()
 
+	queries, err := buildUserListQuery(ctx, page, size, filters)
+	if err != nil {
+		return nil, err
+	}
+
 	var count int64
-	err := r.conn.QueryRowContext(ctx, userSelectQ).Scan(&count)
+
+	err = r.conn.QueryRowContext(ctx, queries.countQ, queries.countArgs...).Scan(&count)
 	if err != nil {
 		span.SetTag("error", true)
 		zap.L().Error("failed to count users", zap.String("op", op), zap.Error(err))
@@ -34,7 +40,7 @@ func (r *Repository) ListUsers(
 		return nil, err
 	}
 
-	rows, err := r.conn.QueryxContext(ctx, userListQ, size, (page-1)*size)
+	rows, err := r.conn.QueryxContext(ctx, queries.dataQ, queries.dataArgs...)
 	if err != nil {
 		span.SetTag("error", true)
 		zap.L().Error(
@@ -62,7 +68,6 @@ func (r *Repository) ListUsers(
 	res := make([]*md.User, 0, size)
 	for rows.Next() {
 		user := &md.User{}
-
 		err = rows.Scan(
 			&user.ID,
 			&user.Name,
@@ -99,7 +104,6 @@ func (r *Repository) ListUsers(
 	}
 
 	totalPages := int((count + int64(size) - 1) / int64(size))
-
 	return &dto.PaginatedUserResponse{
 		Data:        res,
 		Count:       count,
