@@ -48,10 +48,11 @@ func (h *Handler) existsUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := h.ctrl.IsUserExist(r.Context(), req.Email)
-	if err != nil && errors.Is(err, ctrl.ErrNotFound) {
-		utils.ErrResponse(w, http.StatusNotFound, err)
-		return
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, ctrl.ErrNotFound) {
+			utils.ErrResponse(w, http.StatusNotFound, err)
+			return
+		}
 		utils.ErrResponse(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -73,8 +74,9 @@ func (h *Handler) existsUser(w http.ResponseWriter, r *http.Request) {
 //	@Router			/users [get]
 func (h *Handler) listUsers(w http.ResponseWriter, r *http.Request) {
 	page, size := utils.ParsePaginationValues(r)
+	filters := utils.ParseFiltersByURL(r)
 
-	res, err := h.ctrl.ListUsers(r.Context(), page, size, map[string]any{})
+	res, err := h.ctrl.ListUsers(r.Context(), page, size, filters)
 	if err != nil {
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
@@ -106,10 +108,11 @@ func (h *Handler) getMe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := h.ctrl.GetUserByID(r.Context(), uid)
-	if err != nil && errors.Is(err, ctrl.ErrNotFound) {
-		utils.ErrResponse(w, http.StatusNotFound, err)
-		return
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, ctrl.ErrNotFound) {
+			utils.ErrResponse(w, http.StatusNotFound, err)
+			return
+		}
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
 	}
@@ -143,10 +146,11 @@ func (h *Handler) getUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := h.ctrl.GetUserByID(r.Context(), uid)
-	if err != nil && errors.Is(err, ctrl.ErrNotFound) {
-		utils.ErrResponse(w, http.StatusNotFound, err)
-		return
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, ctrl.ErrNotFound) {
+			utils.ErrResponse(w, http.StatusNotFound, err)
+			return
+		}
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
 	}
@@ -171,7 +175,7 @@ func (h *Handler) getUser(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) createUser(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(config.MaxMemory)
 	if err != nil {
-		zap.L().Info("failed to parse multipart form", zap.Error(err))
+		zap.L().Debug("failed to parse multipart form", zap.Error(err))
 		utils.ErrResponse(w, http.StatusBadRequest, hdl.ErrDecodeRequest)
 		return
 	}
@@ -269,10 +273,11 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.ctrl.UpdateUser(r.Context(), uid, req, fileReq)
-	if err != nil && errors.Is(err, ctrl.ErrNotFound) {
-		utils.ErrResponse(w, http.StatusNotFound, err)
-		return
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, ctrl.ErrNotFound) {
+			utils.ErrResponse(w, http.StatusNotFound, err)
+			return
+		}
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
 	}
@@ -306,10 +311,11 @@ func (h *Handler) deleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.ctrl.DeleteUser(r.Context(), uid)
-	if err != nil && errors.Is(err, ctrl.ErrNotFound) {
-		utils.ErrResponse(w, http.StatusNotFound, err)
-		return
-	} else if err != nil {
+	if err != nil {
+		if errors.Is(err, ctrl.ErrNotFound) {
+			utils.ErrResponse(w, http.StatusNotFound, err)
+			return
+		}
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
 	}

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/dto"
 	md "github.com/JMURv/golang-clean-template/internal/models"
 	"github.com/JMURv/golang-clean-template/internal/repo"
@@ -34,7 +35,7 @@ func (r *Repository) ListUsers(
 
 	err = r.conn.QueryRowContext(ctx, queries.countQ, queries.countArgs...).Scan(&count)
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error("failed to count users", zap.String("op", op), zap.Error(err))
 
 		return nil, err
@@ -42,7 +43,7 @@ func (r *Repository) ListUsers(
 
 	rows, err := r.conn.QueryxContext(ctx, queries.dataQ, queries.dataArgs...)
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to list users",
 			zap.String("op", op),
@@ -56,7 +57,7 @@ func (r *Repository) ListUsers(
 	}
 	defer func(rows *sqlx.Rows) {
 		if err := rows.Close(); err != nil {
-			span.SetTag("error", true)
+			span.SetTag(config.ErrorSpanTag, true)
 			zap.L().Error(
 				"failed to close rows",
 				zap.String("op", op),
@@ -79,7 +80,7 @@ func (r *Repository) ListUsers(
 			&user.UpdatedAt,
 		)
 		if err != nil {
-			span.SetTag("error", true)
+			span.SetTag(config.ErrorSpanTag, true)
 			zap.L().Error(
 				"failed to scan user",
 				zap.String("op", op),
@@ -93,7 +94,7 @@ func (r *Repository) ListUsers(
 	}
 
 	if err = rows.Err(); err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to scan rows",
 			zap.String("op", op),
@@ -142,7 +143,7 @@ func (r *Repository) GetUserByID(ctx context.Context, userID uuid.UUID) (*md.Use
 			return nil, repo.ErrNotFound
 		}
 
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to get user",
 			zap.String("op", op),
@@ -187,7 +188,7 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*md.User
 			return nil, repo.ErrNotFound
 		}
 
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to get user",
 			zap.String("op", op),
@@ -212,7 +213,7 @@ func (r *Repository) CreateUser(
 
 	tx, err := r.conn.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to begin transaction",
 			zap.String("op", op),
@@ -224,7 +225,7 @@ func (r *Repository) CreateUser(
 
 	defer func() {
 		if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
-			span.SetTag("error", true)
+			span.SetTag(config.ErrorSpanTag, true)
 			zap.L().Error(
 				"error while transaction rollback",
 				zap.String("op", op),
@@ -269,7 +270,7 @@ func (r *Repository) CreateUser(
 			)
 		}
 
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to create user",
 			zap.String("op", op),
@@ -280,7 +281,7 @@ func (r *Repository) CreateUser(
 	}
 
 	if err = tx.Commit(); err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to commit transaction",
 			zap.String("op", op),
@@ -305,7 +306,7 @@ func (r *Repository) UpdateUser(
 
 	tx, err := r.conn.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to begin transaction",
 			zap.String("op", op),
@@ -317,7 +318,7 @@ func (r *Repository) UpdateUser(
 
 	defer func() {
 		if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
-			span.SetTag("error", true)
+			span.SetTag(config.ErrorSpanTag, true)
 			zap.L().Error(
 				"error while transaction rollback",
 				zap.String("op", op),
@@ -337,7 +338,7 @@ func (r *Repository) UpdateUser(
 		id,
 	)
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to update user",
 			zap.String("op", op),
@@ -368,7 +369,7 @@ func (r *Repository) UpdateUser(
 	}
 
 	if err = tx.Commit(); err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to commit transaction",
 			zap.String("op", op),
@@ -389,7 +390,7 @@ func (r *Repository) DeleteUser(ctx context.Context, id uuid.UUID) error {
 
 	res, err := r.conn.ExecContext(ctx, userDeleteQ, id)
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to delete user",
 			zap.String("op", op),

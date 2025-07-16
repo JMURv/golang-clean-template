@@ -50,7 +50,7 @@ func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	valid, err := h.au.VerifyRecaptcha(req.Token, captcha.PassAuth)
+	valid, err := h.au.VerifyRecaptcha(r.Context(), req.Token, captcha.PassAuth)
 	if err != nil {
 		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 		return
@@ -105,6 +105,7 @@ func (h *Handler) refresh(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := r.Cookie(config.RefreshCookieName)
 	if err != nil {
+		zap.L().Debug("failed to get cookies", zap.Error(err))
 		utils.ErrResponse(w, http.StatusBadRequest, hdl.ErrDecodeRequest)
 		return
 	}

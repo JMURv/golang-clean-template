@@ -61,7 +61,7 @@ func (c *Cache) GetToStruct(ctx context.Context, key string, dest any) error {
 		)
 		return cache.ErrNotFoundInCache
 	} else if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"[CACHE] --> ERROR",
 			zap.String("op", op), zap.String("key", key),
@@ -71,7 +71,7 @@ func (c *Cache) GetToStruct(ctx context.Context, key string, dest any) error {
 	}
 
 	if err = json.Unmarshal(val, dest); err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to unmarshal",
 			zap.String("op", op),
@@ -92,7 +92,7 @@ func (c *Cache) Set(ctx context.Context, t time.Duration, key string, val any) {
 	defer span.Finish()
 
 	if err := c.cli.Set(ctx, key, val, t).Err(); err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"[CACHE] --> ERROR",
 			zap.String("op", op),
@@ -112,7 +112,7 @@ func (c *Cache) Delete(ctx context.Context, key string) {
 	defer span.Finish()
 
 	if err := c.cli.Del(ctx, key).Err(); err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"[CACHE] --> ERROR",
 			zap.String("op", op),

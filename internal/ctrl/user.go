@@ -102,8 +102,7 @@ func (c *Controller) ListUsers(
 		return nil, err
 	}
 
-	bytes, err := json.Marshal(res)
-	if err == nil {
+	if bytes, err := json.Marshal(res); err == nil {
 		c.cache.Set(ctx, config.DefaultCacheTime, cacheKey, bytes)
 	}
 
@@ -117,8 +116,7 @@ func (c *Controller) GetUserByID(ctx context.Context, userID uuid.UUID) (*md.Use
 
 	cached := &md.User{}
 	cacheKey := fmt.Sprintf(userCacheKey, userID)
-	err := c.cache.GetToStruct(ctx, cacheKey, cached)
-	if err == nil {
+	if err := c.cache.GetToStruct(ctx, cacheKey, cached); err == nil {
 		return cached, nil
 	}
 
@@ -146,9 +144,7 @@ func (c *Controller) GetUserByEmail(ctx context.Context, email string) (*md.User
 
 	cached := &md.User{}
 	cacheKey := fmt.Sprintf(userCacheKey, email)
-
-	err := c.cache.GetToStruct(ctx, cacheKey, cached)
-	if err == nil {
+	if err := c.cache.GetToStruct(ctx, cacheKey, cached); err == nil {
 		return cached, nil
 	}
 
@@ -179,7 +175,7 @@ func (c *Controller) CreateUser(
 
 	var err error
 
-	u.Password, err = c.au.Hash(u.Password)
+	u.Password, err = c.au.Hash(ctx, u.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -237,9 +233,7 @@ func (c *Controller) UpdateUser(
 	}
 
 	c.cache.Delete(ctx, fmt.Sprintf(userCacheKey, id))
-
 	go c.cache.InvalidateKeysByPattern(ctx, userPattern)
-
 	return nil
 }
 
@@ -258,8 +252,6 @@ func (c *Controller) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 	}
 
 	c.cache.Delete(ctx, fmt.Sprintf(userCacheKey, userID))
-
 	go c.cache.InvalidateKeysByPattern(ctx, userPattern)
-
 	return nil
 }

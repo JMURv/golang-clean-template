@@ -24,3 +24,5 @@ const (
 	AccessTokenDuration  = time.Minute * 30
 	RefreshTokenDuration = time.Hour * 24 * 7
 )
+
+const ErrorSpanTag = "error"

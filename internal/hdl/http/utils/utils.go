@@ -18,6 +18,7 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
 	"github.com/go-playground/validator/v10"
 	"github.com/goccy/go-json"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -76,6 +77,21 @@ func ParsePaginationValues(r *http.Request) (int, int) {
 	}
 
 	return page, size
+}
+
+func ParseFiltersByURL(r *http.Request) map[string]any {
+	filters := make(map[string]any, len(r.URL.Query()))
+	for key, values := range r.URL.Query() {
+		switch key {
+		case "page", "size":
+			continue
+		case "sort":
+			filters[key] = values[0]
+		default:
+			filters[key] = values[0]
+		}
+	}
+	return filters
 }
 
 func ParseAndValidate(w http.ResponseWriter, r *http.Request, dst any) bool {
@@ -155,6 +171,9 @@ var (
 )
 
 func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileRequest) error {
+	span, _ := opentracing.StartSpanFromContext(r.Context(), "ParseFileField")
+	defer span.Finish()
+
 	file, header, err := r.FormFile(fieldName)
 	if err != nil && !errors.Is(err, http.ErrMissingFile) {
 		return ErrInvalidFileUpload
@@ -163,6 +182,7 @@ func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileReq
 	if header != nil {
 		defer func(file multipart.File) {
 			if err = file.Close(); err != nil {
+				span.SetTag(config.ErrorSpanTag, true)
 				zap.L().Error("failed to close file", zap.Error(err))
 			}
 		}(file)
@@ -178,6 +198,7 @@ func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileReq
 
 		fileReq.File, err = io.ReadAll(file)
 		if err != nil {
+			span.SetTag(config.ErrorSpanTag, true)
 			zap.L().Error("failed to read file", zap.Error(err))
 			return hdl.ErrInternal
 		}

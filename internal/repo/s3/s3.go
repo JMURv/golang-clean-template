@@ -9,6 +9,7 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -73,6 +74,7 @@ type UploadFileRequest struct {
 }
 
 func (s *S3) UploadFile(ctx context.Context, req *UploadFileRequest) (string, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "s3.UploadFile")
 	uniqueName := fmt.Sprintf("%d-%s", time.Now().UnixNano(), req.Filename)
 
 	_, err := s.cli.PutObject(
@@ -87,6 +89,7 @@ func (s *S3) UploadFile(ctx context.Context, req *UploadFileRequest) (string, er
 		},
 	)
 	if err != nil {
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error("[S3] failed to upload file", zap.Error(err))
 		return "", ErrFailedToUploadFile
 	}

@@ -122,7 +122,7 @@ func TestHandler_Authenticate(t *testing.T) {
 				assert.Equal(t, hdl.ErrInternal.Error(), res.Errors[0])
 			},
 			expect: func() {
-				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any()).Return(false, testErr)
+				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any(), gomock.Any()).Return(false, testErr)
 			},
 		},
 		{
@@ -141,7 +141,7 @@ func TestHandler_Authenticate(t *testing.T) {
 				assert.Equal(t, captcha.ErrValidationFailed.Error(), res.Errors[0])
 			},
 			expect: func() {
-				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any()).Return(false, nil)
+				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any(), gomock.Any()).Return(false, nil)
 			},
 		},
 		{
@@ -160,7 +160,7 @@ func TestHandler_Authenticate(t *testing.T) {
 				assert.Equal(t, ctrl.ErrNotFound.Error(), res.Errors[0])
 			},
 			expect: func() {
-				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any()).Return(true, nil)
+				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any(), gomock.Any()).Return(true, nil)
 				mctrl.EXPECT().Authenticate(
 					gomock.Any(), &dto.DeviceRequest{
 						IP: "0.0.0.0",
@@ -189,7 +189,7 @@ func TestHandler_Authenticate(t *testing.T) {
 				assert.Equal(t, auth.ErrInvalidCredentials.Error(), res.Errors[0])
 			},
 			expect: func() {
-				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any()).Return(true, nil)
+				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any(), gomock.Any()).Return(true, nil)
 				mctrl.EXPECT().Authenticate(
 					gomock.Any(), &dto.DeviceRequest{
 						IP: "0.0.0.0",
@@ -218,7 +218,7 @@ func TestHandler_Authenticate(t *testing.T) {
 				assert.Equal(t, hdl.ErrInternal.Error(), res.Errors[0])
 			},
 			expect: func() {
-				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any()).Return(true, nil)
+				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any(), gomock.Any()).Return(true, nil)
 				mctrl.EXPECT().Authenticate(
 					gomock.Any(), &dto.DeviceRequest{
 						IP: "0.0.0.0",
@@ -244,7 +244,7 @@ func TestHandler_Authenticate(t *testing.T) {
 				assert.Contains(t, r.Header().Get("Set-Cookie"), config.AccessCookieName)
 			},
 			expect: func() {
-				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any()).Return(true, nil)
+				mauth.EXPECT().VerifyRecaptcha(gomock.Any(), gomock.Any(), gomock.Any()).Return(true, nil)
 				mctrl.EXPECT().Authenticate(
 					gomock.Any(), &dto.DeviceRequest{
 						IP: "0.0.0.0",

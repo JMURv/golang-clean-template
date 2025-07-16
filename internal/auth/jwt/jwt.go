@@ -86,6 +86,7 @@ func (c *Core) NewToken(ctx context.Context, uid uuid.UUID, d time.Duration) (st
 		},
 	).SignedString(c.secret)
 	if err != nil {
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			ErrWhileCreatingToken.Error(),
 			zap.Error(err),
@@ -105,12 +106,14 @@ func (c *Core) ParseClaims(ctx context.Context, tokenStr string) (Claims, error)
 	token, err := jwt.ParseWithClaims(
 		tokenStr, &claims, func(token *jwt.Token) (any, error) {
 			if token.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+				span.SetTag(config.ErrorSpanTag, true)
 				return nil, ErrUnexpectedSignMethod
 			}
 			return c.secret, nil
 		},
 	)
 	if err != nil {
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"Failed to parse claims",
 			zap.String("op", op),

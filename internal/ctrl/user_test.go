@@ -486,7 +486,7 @@ func TestController_CreateUser(t *testing.T) {
 			name: "SuccessWithoutAvatar",
 			setup: func() {
 				mockAuth.EXPECT().
-					Hash(testPassword).
+					Hash(gomock.Any(), testPassword).
 					Return(testHash, nil)
 
 				mockRepo.EXPECT().
@@ -507,7 +507,7 @@ func TestController_CreateUser(t *testing.T) {
 			name: "SuccessWithAvatar",
 			setup: func() {
 				mockAuth.EXPECT().
-					Hash(gomock.Any()).
+					Hash(gomock.Any(), gomock.Any()).
 					Return(testHash, nil)
 
 				mockS3.EXPECT().
@@ -532,7 +532,7 @@ func TestController_CreateUser(t *testing.T) {
 			name: "PasswordHashError",
 			setup: func() {
 				mockAuth.EXPECT().
-					Hash(gomock.Any()).
+					Hash(gomock.Any(), gomock.Any()).
 					Return("", errors.New("hashing error"))
 			},
 			request:  baseRequest,
@@ -544,7 +544,7 @@ func TestController_CreateUser(t *testing.T) {
 			name: "S3UploadError",
 			setup: func() {
 				mockAuth.EXPECT().
-					Hash(gomock.Any()).
+					Hash(gomock.Any(), gomock.Any()).
 					Return(testHash, nil)
 
 				mockS3.EXPECT().
@@ -560,7 +560,7 @@ func TestController_CreateUser(t *testing.T) {
 			name: "UserAlreadyExists",
 			setup: func() {
 				mockAuth.EXPECT().
-					Hash(gomock.Any()).
+					Hash(gomock.Any(), gomock.Any()).
 					Return(testHash, nil)
 
 				mockRepo.EXPECT().
@@ -577,7 +577,7 @@ func TestController_CreateUser(t *testing.T) {
 			name: "RepositoryError",
 			setup: func() {
 				mockAuth.EXPECT().
-					Hash(gomock.Any()).
+					Hash(gomock.Any(), gomock.Any()).
 					Return(testHash, nil)
 
 				mockRepo.EXPECT().

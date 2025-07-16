@@ -24,7 +24,7 @@ func (r *Repository) ListDevices(ctx context.Context, uid uuid.UUID) ([]md.Devic
 
 	err := r.conn.SelectContext(ctx, &devices, listDevices, uid)
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to list devices",
 			zap.String("op", op),
@@ -47,17 +47,18 @@ func (r *Repository) GetDevice(ctx context.Context, uid uuid.UUID, dID string) (
 	res := md.Device{}
 
 	err := r.conn.GetContext(ctx, &res, getDevice, dID, uid)
-	if errors.Is(err, sql.ErrNoRows) {
-		zap.L().Debug(
-			"no device found",
-			zap.String("op", op),
-			zap.String("userID", uid.String()),
-			zap.String("deviceID", dID),
-		)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			zap.L().Debug(
+				"no device found",
+				zap.String("op", op),
+				zap.String("userID", uid.String()),
+				zap.String("deviceID", dID),
+			)
+			return nil, repo.ErrNotFound
+		}
 
-		return nil, repo.ErrNotFound
-	} else if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to get device",
 			zap.String("op", op),
@@ -65,7 +66,6 @@ func (r *Repository) GetDevice(ctx context.Context, uid uuid.UUID, dID string) (
 			zap.String("deviceID", dID),
 			zap.Error(err),
 		)
-
 		return nil, err
 	}
 
@@ -81,23 +81,23 @@ func (r *Repository) GetDeviceByID(ctx context.Context, dID string) (*md.Device,
 	res := md.Device{}
 
 	err := r.conn.GetContext(ctx, &res, getDeviceByID, dID)
-	if errors.Is(err, sql.ErrNoRows) {
-		zap.L().Debug(
-			"no device found",
-			zap.String("op", op),
-			zap.String("deviceID", dID),
-		)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			zap.L().Debug(
+				"no device found",
+				zap.String("op", op),
+				zap.String("deviceID", dID),
+			)
+			return nil, repo.ErrNotFound
+		}
 
-		return nil, repo.ErrNotFound
-	} else if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to get device",
 			zap.String("op", op),
 			zap.String("deviceID", dID),
 			zap.Error(err),
 		)
-
 		return nil, err
 	}
 
@@ -117,7 +117,7 @@ func (r *Repository) UpdateDevice(
 
 	res, err := r.conn.ExecContext(ctx, updateDevice, req.Name, dID, uid)
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to update device",
 			zap.String("op", op),
@@ -131,6 +131,7 @@ func (r *Repository) UpdateDevice(
 
 	aff, err := res.RowsAffected()
 	if err != nil {
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to get affected rows",
 			zap.String("op", op),
@@ -169,7 +170,7 @@ func (r *Repository) DeleteDevice(ctx context.Context, userID uuid.UUID, deviceI
 
 	res, err := r.conn.ExecContext(ctx, deleteDevice, deviceID, userID)
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to delete device",
 			zap.String("op", op),
@@ -183,6 +184,7 @@ func (r *Repository) DeleteDevice(ctx context.Context, userID uuid.UUID, deviceI
 
 	aff, err := res.RowsAffected()
 	if err != nil {
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"failed to get affected rows",
 			zap.String("op", op),

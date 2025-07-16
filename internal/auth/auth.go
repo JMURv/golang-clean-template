@@ -8,12 +8,13 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/auth/jwt"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/google/uuid"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Core interface {
-	Hash(pswd string) (string, error)
+	Hash(ctx context.Context, pswd string) (string, error)
 	ComparePasswords(hashed, pswd []byte) error
 	jwt.Port
 	captcha.Port
@@ -31,9 +32,11 @@ func New(conf config.Config) *Auth {
 	}
 }
 
-func (a *Auth) Hash(val string) (string, error) {
+func (a *Auth) Hash(ctx context.Context, val string) (string, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "Hash")
 	bytes, err := bcrypt.GenerateFromPassword([]byte(val), bcrypt.MinCost)
 	if err != nil {
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error(
 			"Failed to generate hash",
 			zap.String("val", val),
@@ -71,6 +74,10 @@ func (a *Auth) ParseClaims(ctx context.Context, tokenStr string) (jwt.Claims, er
 	return a.jwt.ParseClaims(ctx, tokenStr)
 }
 
-func (a *Auth) VerifyRecaptcha(token string, action captcha.Actions) (bool, error) {
-	return a.captcha.VerifyRecaptcha(token, action)
+func (a *Auth) VerifyRecaptcha(
+	ctx context.Context,
+	token string,
+	action captcha.Actions,
+) (bool, error) {
+	return a.captcha.VerifyRecaptcha(ctx, token, action)
 }

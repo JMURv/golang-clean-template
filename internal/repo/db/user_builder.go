@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 
+	"github.com/JMURv/golang-clean-template/internal/config"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
@@ -37,7 +38,7 @@ func buildUserListQuery(
 
 	countSql, countArgs, err := query.Columns("COUNT(DISTINCT u.id)").ToSql()
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error("failed to build count query", zap.String("op", op), zap.Error(err))
 		return userListQuery{}, err
 	}
@@ -57,7 +58,7 @@ func buildUserListQuery(
 		Offset(uint64((page - 1) * size)).
 		ToSql()
 	if err != nil {
-		span.SetTag("error", true)
+		span.SetTag(config.ErrorSpanTag, true)
 		zap.L().Error("failed to build data query", zap.String("op", op), zap.Error(err))
 		return userListQuery{}, err
 	}
