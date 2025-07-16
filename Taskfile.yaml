@@ -8,8 +8,6 @@ vars:
   PROD_ENV_PATH: "build/configs/envs/.env.prod"
   PROD_DC_PATH: "build/compose.yaml"
 
-  OBSERVE_DC_PATH: "build/compose-observe.yaml"
-
   K6_ENV_PATH: "build/configs/envs/.env.k6"
   K6_DC_PATH: "build/compose-k6.yaml"
 
@@ -66,23 +64,10 @@ tasks:
   # END
 
   # DOCKER
-  net:
-    desc: Create all networks
-    cmds:
-      - "docker network create {{.PROJECT_NAME}}-dev || true"
-      - "docker network create {{.PROJECT_NAME}}-prod || true"
-      - "docker network create {{.PROJECT_NAME}}-k6 || true"
-
   dc-prod:
     desc: Run prod compose
     cmds:
       - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} up --watch"
-
-  dc-prod-obs:
-    desc: Run prod compose with observe
-    cmds:
-      - "task net"
-      - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} -f {{.OBSERVE_DC_PATH}} up --watch"
 
   dc-prod-build:
     desc: Build prod compose
@@ -94,21 +79,20 @@ tasks:
     cmds:
       - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} down"
 
+  dc-prod-obs:
+    desc: Run prod compose with observe
+    cmds:
+      - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} --profile observe up --watch"
+
   dc-prod-obs-down:
     desc: Shutdown prod compose with observe containers
     cmds:
-      - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} -f {{.OBSERVE_DC_PATH}} down"
+      - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} --profile observe down"
 
   dc-dev:
     desc: Run dev compose
     cmds:
       - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} up --watch"
-
-  dc-dev-obs:
-    desc: Run dev compose with observe
-    cmds:
-      - "task net"
-      - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} -f {{.OBSERVE_DC_PATH}} up --watch"
 
   dc-dev-build:
     desc: Run dev compose
@@ -120,27 +104,31 @@ tasks:
     cmds:
       - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} down"
 
+  dc-dev-obs:
+    desc: Run dev compose with observe
+    cmds:
+      - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} --profile observe up --watch"
+
   dc-dev-obs-down:
     desc: Shutdown dev compose with observe containers
     cmds:
-      - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} -f {{.OBSERVE_DC_PATH}} down"
+      - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} --profile observe down"
 
   dc-k6:
     desc: Run k6 compose
     cmds:
-      - "task net"
-      - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} -f {{.OBSERVE_DC_PATH}} up"
+      - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} --profile observe up"
+      - "task dc-k6-down"
 
   dc-k6-build:
     desc: Build k6 containers
     cmds:
-      - "task net"
       - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} build"
 
   dc-k6-down:
     desc: Shutdown k6 containers
     cmds:
-      - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} -f {{.OBSERVE_DC_PATH}} down"
+      - "docker compose --env-file {{.K6_ENV_PATH}} -f {{.K6_DC_PATH}} --profile observe down -v"
 
   # END
 

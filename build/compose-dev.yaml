@@ -44,10 +44,70 @@ services:
             - .git
             - vendor
 
+  jaeger:
+    extends:
+      service: jaeger
+      file: compose.yaml
+    networks: !override [ app-template-dev ]
+
+  prometheus:
+    extends:
+      service: prometheus
+      file: compose.yaml
+    volumes: !override
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data_dev:/prometheus
+    networks: !override [ app-template-dev ]
+
+  node-exp:
+    extends:
+      service: node-exp
+      file: compose.yaml
+    networks: !override [ app-template-dev ]
+
+  grafana:
+    extends:
+      service: grafana
+      file: compose.yaml
+    volumes: !override
+      - grafana_data_dev:/var/lib/grafana
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks: !override [ app-template-dev ]
+
+  loki:
+    extends:
+      service: loki
+      file: compose.yaml
+    volumes: !override
+      - loki_data_dev:/loki
+      - ./configs/loki:/etc/loki
+    networks: !override [ app-template-dev ]
+
+  promtail:
+    extends:
+      service: promtail
+      file: compose.yaml
+    networks: !override [ app-template-dev ]
+
+  postgres-exporter:
+    extends:
+      service: postgres-exporter
+      file: compose.yaml
+    networks: !override [ app-template-dev ]
+
+  redis-exporter:
+    extends:
+      service: redis-exporter
+      file: compose.yaml
+    networks: !override [ app-template-dev ]
+
 volumes:
   pg_data_dev:
   minio_data_dev:
   redis_data_dev:
+  prometheus_data_dev:
+  grafana_data_dev:
+  loki_data_dev:
 
 networks:
   app-template-dev:

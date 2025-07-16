@@ -1,5 +1,4 @@
 ### REMOVE ME
-TODO: Add install commands for swag, protoc and k6
 
 Find and replace all `app-template` to your project's name.
 As well, do it for `github.com/JMURv/golang-clean-template`, that used in go backend.
@@ -79,7 +78,7 @@ Run prod with observation containers:
 task dc-prod-obs
 ```
 
-`compose-observe.yaml` file starts svcs like: `prometheus`, `jaeger`, `node-exporter`, `grafana` and etc.
+Observe profile starts svcs like: `prometheus`, `jaeger`, `node-exporter`, `grafana` and etc.
 
 Services are available at:
 
@@ -94,7 +93,7 @@ Services are available at:
 | Loki             | http://localhost:3100  |
 | Grafana          | http://localhost:3000  |
 
-More information could be found inside `compose-observe.yaml`.
+More information could be found inside `compose.yaml`.
 
 ___
 
@@ -124,7 +123,11 @@ task t-integration
 ```
 It will spin up all containers for integration testing automatically using `testcontainers`.
 
-### Load testing
+### Load testing 
+Run:
 ```shell
 task dc-k6
 ```
+
+It will spin up all `prod` environment, including observation containers and starts k6 scenario.
+Grafana has prebuilt dashboard for k6.

@@ -90,10 +90,114 @@ services:
             - .git
             - vendor
 
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    profiles: ["observe"]
+    ports:
+      - "14268:14268"
+      - "16686:16686"
+      - "6831:6831/udp"
+    networks: [ app-template-prod ]
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    profiles: ["observe"]
+    command:
+      - --web.enable-remote-write-receiver
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks: [ app-template-prod ]
+
+  node-exp:
+    container_name: node-exp
+    image: prom/node-exporter
+    restart: unless-stopped
+    profiles: ["observe"]
+    ports:
+      - "9100:9100"
+    networks: [ app-template-prod ]
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    profiles: ["observe"]
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks: [ app-template-prod ]
+
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    restart: unless-stopped
+    profiles: ["observe"]
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - loki_data:/loki
+      - ./configs/loki:/etc/loki
+    networks: [ app-template-prod ]
+
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:latest
+    restart: unless-stopped
+    profiles: ["observe"]
+    volumes:
+      - ./configs/promtail:/etc/promtail
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    depends_on:
+      - loki
+    networks: [ app-template-prod ]
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    profiles: ["observe"]
+    environment:
+      DATA_SOURCE_NAME: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [ app-template-prod ]
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.43.0
+    profiles: ["observe"]
+    environment:
+      - REDIS_ADDR=redis:6379
+    ports:
+      - "9121:9121"
+    depends_on:
+      redis:
+        condition: service_started
+    networks: [ app-template-prod ]
+
+
 volumes:
   pg_data_prod:
   minio_data_prod:
   redis_data_prod:
+  prometheus_data_prod:
+  grafana_data_prod:
+  loki_data_prod:
 
 networks:
   app-template-prod:
