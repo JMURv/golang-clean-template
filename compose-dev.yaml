@@ -27,10 +27,10 @@ services:
   backend:
     image: app-template-backend:latest-dev
     build:
-      context: ../
-      dockerfile: ./build/docker/Dockerfile.dev
+      context: .
+      dockerfile: Dockerfile.dev
     env_file: !override
-      - ./configs/envs/.env.dev
+      - ./build/configs/envs/.env.dev
     extends:
       file: compose.yaml
       service: backend

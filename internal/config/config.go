@@ -9,6 +9,7 @@ import (
 )
 
 type Config struct {
+	LogLvl      string `env:"LOG_LEVEL"     envDefault:"debug"`
 	Mode        string `env:"MODE"         envDefault:"dev"`
 	ServiceName string `env:"SERVICE_NAME" envDefault:"sso"`
 	Server      ServerConfig
@@ -81,14 +82,15 @@ type jaegerConfig struct {
 	} `yaml:"reporter"`
 }
 
-func MustLoad(path string) Config {
-	if err := godotenv.Load(path); err != nil {
+func MustLoad() Config {
+	const defaultPath = "config/.env"
+	if err := godotenv.Load(defaultPath); err != nil {
 		if !os.IsNotExist(err) {
 			panic("failed to load .env file: " + err.Error())
 		}
 		log.Println("No .env file found, using system environment variables")
 	} else {
-		log.Println("Loaded environment variables from: " + path)
+		log.Println("Loaded environment variables from: " + defaultPath)
 	}
 
 	conf := Config{}
@@ -97,5 +99,6 @@ func MustLoad(path string) Config {
 	}
 
 	log.Println("Load configuration from environment")
+
 	return conf
 }

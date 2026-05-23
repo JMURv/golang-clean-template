@@ -58,10 +58,10 @@ services:
     restart: unless-stopped
     image: app-template-backend:latest
     build:
-      context: ../
-      dockerfile: ./build/docker/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     env_file:
-      - ./configs/envs/.env.prod
+      - ./build/configs/envs/.env.prod
     ports:
       - "${SERVER_HTTP_PORT}:${SERVER_HTTP_PORT}"
       - "${SERVER_GRPC_PORT}:${SERVER_GRPC_PORT}"

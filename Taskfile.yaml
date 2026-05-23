@@ -3,13 +3,13 @@ version: 3
 vars:
   PROJECT_NAME: "app-template"
   DEV_ENV_PATH: "build/configs/envs/.env.dev"
-  DEV_DC_PATH: "build/compose-dev.yaml"
+  DEV_DC_PATH: "compose-dev.yaml"
 
   PROD_ENV_PATH: "build/configs/envs/.env.prod"
-  PROD_DC_PATH: "build/compose.yaml"
+  PROD_DC_PATH: "compose.yaml"
 
   K6_ENV_PATH: "build/configs/envs/.env.k6"
-  K6_DC_PATH: "build/compose-k6.yaml"
+  K6_DC_PATH: "compose-k6.yaml"
 
 
 tasks:

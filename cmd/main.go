@@ -23,13 +23,25 @@ import (
 
 const cancelTimeout = 10 * time.Second
 
-func mustRegisterLogger(mode string) {
+func mustRegisterLogger(mode, level string) {
+	var cfg zap.Config
+
 	switch mode {
 	case "prod":
-		zap.ReplaceGlobals(zap.Must(zap.NewProduction()))
+		cfg = zap.NewProductionConfig()
 	case "dev":
-		zap.ReplaceGlobals(zap.Must(zap.NewDevelopment()))
+		cfg = zap.NewDevelopmentConfig()
+	default:
+		panic("unknown mode: " + mode)
 	}
+
+	lvl := zap.NewAtomicLevel()
+	if err := lvl.UnmarshalText([]byte(level)); err != nil {
+		panic("invalid log level: " + level)
+	}
+
+	cfg.Level = lvl
+	zap.ReplaceGlobals(zap.Must(cfg.Build()))
 }
 
 func main() {
@@ -39,12 +51,11 @@ func main() {
 		}
 	}()
 
-	const path = "config/.env"
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	conf := config.MustLoad(path)
-	mustRegisterLogger(conf.Mode)
+	conf := config.MustLoad()
+	mustRegisterLogger(conf.Mode, conf.LogLvl)
 
 	prom := prometheus.New(conf.Server.PromPort)
 	go prom.Start()

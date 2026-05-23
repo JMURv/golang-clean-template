@@ -27,7 +27,7 @@ services:
       service: backend
       file: compose.yaml
     env_file: !override
-      - ./configs/envs/.env.k6
+      - ./build/configs/envs/.env.k6
     networks: !override [ app-template-k6 ]
 
   k6:
@@ -57,7 +57,7 @@ services:
       service: prometheus
       file: compose.yaml
     volumes: !override
-      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./build/configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks: !override [ app-template-k6 ]
 
   node-exp:
@@ -71,7 +71,7 @@ services:
       service: grafana
       file: compose.yaml
     volumes: !override
-      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./build/configs/grafana/provisioning:/etc/grafana/provisioning:ro
     networks: !override [ app-template-k6 ]
 
   loki:
@@ -79,7 +79,7 @@ services:
       service: loki
       file: compose.yaml
     volumes: !override
-      - ./configs/loki:/etc/loki
+      - ./build/configs/loki:/etc/loki
     networks: !override [ app-template-k6 ]
 
   promtail:

@@ -9,6 +9,32 @@ Specify **Docker Hub** `USERNAME`, `PASSWORD` and desired `IMAGE_NAME` secrets i
 This is required to build and push docker image.
 ### END
 
+## Tooling
+Install `swaggo`:
+```shell
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+
+---
+
+Install `protoc`:
+
+Visit: https://protobuf.dev/installation/ to install `protoc`
+```shell
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+```
+
+---
+
+Install `golangci-lint`:
+```shell
+https://golangci-lint.run/docs/welcome/install/local/
+```
+
+---
+
 ## Stack
 |          | Technology |
 |----------|------------|
@@ -17,12 +43,9 @@ This is required to build and push docker image.
 ---
 ## Configuration
 ### App
-Configuration files for local dev placed in `/config`
-
-Configuration files for docker dev placed in `/build/configs/envs`
+Configuration files for dev placed in `/build/configs/envs`
 - Create your own `.env` based on `.env.example`:
 ```shell
-cp config/.env.example config/.env && \
 cp build/configs/envs/.env.example build/configs/envs/.env.dev && \
 cp build/configs/envs/.env.example build/configs/envs/.env.prod
 ```
