@@ -17,9 +17,9 @@ go install github.com/swaggo/swag/cmd/swag@latest
 
 ---
 
-Install `protoc`:
+[Visit to install protoc](https://protobuf.dev/installation/)
 
-Visit: https://protobuf.dev/installation/ to install `protoc`
+Then do:
 ```shell
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
@@ -28,10 +28,7 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 ---
 
-Install `golangci-lint`:
-```shell
-https://golangci-lint.run/docs/welcome/install/local/
-```
+[Install golangci-lint](https://golangci-lint.run/docs/welcome/install/local/)
 
 ---
 
