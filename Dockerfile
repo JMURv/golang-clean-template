@@ -19,7 +19,7 @@ RUN upx ./main
 FROM alpine:3.20 AS runner
 ENV MIGRATIONS_PATH=.
 
-COPY ./internal/repo/db/migration ./
+COPY ./migrations ./
 COPY --from=builder /app/main ./
 RUN apk add --no-cache curl
 

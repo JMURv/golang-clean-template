@@ -21,9 +21,7 @@ func applyMigrations(db *sql.DB, conf config.Config) error {
 
 	path := os.Getenv("MIGRATIONS_PATH")
 	if path == "" {
-		path = filepath.ToSlash(
-			filepath.Join("internal", "repo", "db", "migration"),
-		)
+		path = filepath.ToSlash(filepath.Join("migrations"))
 	}
 
 	m, err := migrate.NewWithDatabaseInstance("file://"+path, conf.DB.Database, driver)

@@ -243,7 +243,7 @@ func init() {
 	)
 
 	_ = os.Setenv("MIGRATIONS_PATH", filepath.ToSlash(
-		filepath.Join(rootDir, "internal", "repo", "db", "migration"),
+		filepath.Join(rootDir, "migrations"),
 	))
 
 	wg := &sync.WaitGroup{}
