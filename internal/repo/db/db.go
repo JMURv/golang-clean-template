@@ -2,12 +2,13 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/JMURv/golang-clean-template/internal/config"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/pressly/goose/v3"
 	"go.uber.org/zap"
 )
 
@@ -34,7 +35,7 @@ func New(config config.Config) *Repository {
 		zap.L().Fatal("failed to ping the database", zap.Error(err))
 	}
 
-	if err = applyMigrations(conn.DB, config); err != nil {
+	if err = applyMigrations(conn.DB); err != nil {
 		zap.L().Fatal("failed to apply migrations", zap.Error(err))
 	}
 
@@ -55,3 +56,21 @@ func (r *Repository) Close(ctx context.Context) error {
 		return err
 	}
 }
+
+func applyMigrations(db *sql.DB) error {
+	err := goose.SetDialect("postgres")
+	if err != nil {
+		zap.L().Error("failed to set postgres dialect", zap.Error(err))
+		return err
+	}
+
+	err = goose.Up(db, "migrations")
+	if err != nil {
+		return err
+	}
+
+	zap.L().Info("migrations applied")
+	return nil
+}
+
+func mustPrecreate(conf config.Config, db *sql.DB) {}

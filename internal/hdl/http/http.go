@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	_ "github.com/JMURv/golang-clean-template/api/rest/v1"
+	// _ "github.com/JMURv/golang-clean-template/api/rest/v1"
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	mid "github.com/JMURv/golang-clean-template/internal/hdl/http/middleware"

@@ -32,6 +32,13 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 ---
 
+Install mockgen:
+```shell
+go install go.uber.org/mock/mockgen@latest
+```
+
+---
+
 ## Stack
 |          | Technology |
 |----------|------------|

@@ -27,6 +27,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// TODO:
+
 const getTables = `
 SELECT tablename 
 FROM pg_tables 
