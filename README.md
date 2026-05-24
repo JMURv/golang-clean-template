@@ -1,3 +1,5 @@
+[![Go Coverage](https://github.com/<USER>/<REPO>/wiki/coverage.svg)](https://raw.githack.com/wiki/<USER>/<REPO>/coverage.html)
+
 ### REMOVE ME
 
 Find and replace all `app-template` to your project's name.
