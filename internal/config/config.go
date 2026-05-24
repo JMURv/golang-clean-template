@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	LogLvl      string `env:"LOG_LEVEL"     envDefault:"debug"`
+	LogLvl      string `env:"LOG_LEVEL"    envDefault:"debug"`
 	Mode        string `env:"MODE"         envDefault:"dev"`
 	ServiceName string `env:"SERVICE_NAME" envDefault:"app-template"`
 	Server      ServerConfig

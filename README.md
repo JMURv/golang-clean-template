@@ -1,6 +1,4 @@
-[![Go Coverage](https://github.com/<USER>/<REPO>/wiki/coverage.svg)](https://raw.githack.com/wiki/<USER>/<REPO>/coverage.html)
-
-### REMOVE ME
+### REMOVE ME FROM HERE
 
 Find and replace all `app-template` to your project's name.
 As well, do it for `github.com/JMURv/golang-clean-template`, that used in go backend.
@@ -9,9 +7,8 @@ As well, do it for `github.com/JMURv/golang-clean-template`, that used in go bac
 Specify **Docker Hub** `USERNAME`, `PASSWORD` and desired `IMAGE_NAME` secrets in GH Actions repo.
 
 This is required to build and push docker image.
-### END
 
-## Tooling
+### Tooling
 Install `swaggo`:
 ```shell
 go install github.com/swaggo/swag/cmd/swag@latest
@@ -34,10 +31,14 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 ---
 
-Install mockgen:
+Install `mockgen`:
 ```shell
 go install go.uber.org/mock/mockgen@latest
 ```
+
+### TO HERE
+
+[![Go Coverage](https://github.com/<USER>/<REPO>/wiki/coverage.svg)](https://raw.githack.com/wiki/<USER>/<REPO>/coverage.html)
 
 ---
 
