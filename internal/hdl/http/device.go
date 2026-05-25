@@ -1,11 +1,9 @@
 package http
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/JMURv/golang-clean-template/internal/config"
-	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/dto"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	mid "github.com/JMURv/golang-clean-template/internal/hdl/http/middleware"
@@ -47,12 +45,7 @@ func (h *Handler) listDevices(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.ctrl.ListDevices(r.Context(), uid)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -95,12 +88,7 @@ func (h *Handler) getDevice(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.ctrl.GetDevice(r.Context(), uid, dID)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -150,12 +138,7 @@ func (h *Handler) updateDevice(w http.ResponseWriter, r *http.Request) {
 
 	err := h.ctrl.UpdateDevice(r.Context(), uid, dID, req)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -198,12 +181,7 @@ func (h *Handler) deleteDevice(w http.ResponseWriter, r *http.Request) {
 
 	err := h.ctrl.DeleteDevice(r.Context(), uid, dID)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 

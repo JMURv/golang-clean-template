@@ -5,6 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/dto"
@@ -18,11 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
-	"mime/multipart"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-	"time"
 )
 
 func TestHandler_ExistsUser(t *testing.T) {
@@ -38,7 +39,7 @@ func TestHandler_ExistsUser(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		payload    interface{}
+		payload    any
 		status     int
 		expect     func()
 		assertions func(r *httptest.ResponseRecorder)
@@ -57,7 +58,7 @@ func TestHandler_ExistsUser(t *testing.T) {
 		},
 		{
 			name:    "ErrDecodeRequest_InvalidEmail",
-			payload: map[string]interface{}{"email": ""},
+			payload: map[string]any{"email": ""},
 			status:  http.StatusBadRequest,
 			assertions: func(r *httptest.ResponseRecorder) {
 				res := &utils.ErrorsResponse{}
@@ -69,7 +70,7 @@ func TestHandler_ExistsUser(t *testing.T) {
 		},
 		{
 			name:    "StatusNotFound",
-			payload: map[string]interface{}{"email": testEmail},
+			payload: map[string]any{"email": testEmail},
 			status:  http.StatusNotFound,
 			assertions: func(r *httptest.ResponseRecorder) {
 				res := &utils.ErrorsResponse{}
@@ -85,13 +86,13 @@ func TestHandler_ExistsUser(t *testing.T) {
 		},
 		{
 			name:    "StatusInternalServerError",
-			payload: map[string]interface{}{"email": testEmail},
+			payload: map[string]any{"email": testEmail},
 			status:  http.StatusInternalServerError,
 			assertions: func(r *httptest.ResponseRecorder) {
 				res := &utils.ErrorsResponse{}
 				err := json.NewDecoder(r.Result().Body).Decode(res)
 				assert.Nil(t, err)
-				assert.Equal(t, testErr.Error(), res.Errors[0])
+				assert.Equal(t, hdl.ErrInternal.Error(), res.Errors[0])
 			},
 			expect: func() {
 				mctrl.EXPECT().IsUserExist(gomock.Any(), testEmail).Return(&dto.ExistsUserResponse{
@@ -117,7 +118,7 @@ func TestHandler_ExistsUser(t *testing.T) {
 		},
 		{
 			name:    "Success_UserNotExists",
-			payload: map[string]interface{}{"email": testEmail},
+			payload: map[string]any{"email": testEmail},
 			status:  http.StatusOK,
 			assertions: func(r *httptest.ResponseRecorder) {
 				var response dto.ExistsUserResponse
@@ -341,7 +342,7 @@ func TestHandler_GetMe(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		uid        interface{} // Can be uuid.UUID or other types
+		uid        any // Can be uuid.UUID or other types
 		status     int
 		expect     func()
 		assertions func(r *httptest.ResponseRecorder)
@@ -583,19 +584,19 @@ func TestHandler_CreateUser(t *testing.T) {
 	mauth := mocks.NewMockCore(mock)
 	h := New(mauth, mctrl)
 
-	validRequest := map[string]interface{}{
+	validRequest := map[string]any{
 		"name":     "Test User",
 		"email":    "test@example.com",
 		"password": "securePassword123!",
 	}
 
-	invalidRequest := map[string]interface{}{
+	invalidRequest := map[string]any{
 		"email": "invalid-email",
 	}
 
 	tests := []struct {
 		name          string
-		payload       interface{}
+		payload       any
 		withAvatar    bool
 		avatarContent []byte
 		status        int

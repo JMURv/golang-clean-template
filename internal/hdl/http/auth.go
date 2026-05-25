@@ -1,13 +1,10 @@
 package http
 
 import (
-	"errors"
 	"net/http"
 
-	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/auth/captcha"
 	"github.com/JMURv/golang-clean-template/internal/config"
-	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/dto"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	mid "github.com/JMURv/golang-clean-template/internal/hdl/http/middleware"
@@ -63,17 +60,7 @@ func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.ctrl.Authenticate(r.Context(), &d, req)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-
-		if errors.Is(err, auth.ErrInvalidCredentials) {
-			utils.ErrResponse(w, http.StatusUnauthorized, err)
-			return
-		}
-
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -116,15 +103,7 @@ func (h *Handler) refresh(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		} else if errors.Is(err, auth.ErrTokenRevoked) {
-			utils.ErrResponse(w, http.StatusUnauthorized, err)
-			return
-		}
-
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -156,11 +135,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 
 	err := h.ctrl.Logout(r.Context(), uid)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 

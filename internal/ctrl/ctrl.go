@@ -6,6 +6,7 @@ import (
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/repo/s3"
+	"github.com/google/uuid"
 )
 
 type AppRepo interface {
@@ -34,10 +35,15 @@ type CacheService interface {
 
 type EmailService any
 
+type QueueService interface {
+	Publish(subject string, payload any, uid uuid.UUID) error
+}
+
 type Controller struct {
 	au    auth.Core
 	repo  AppRepo
 	cache CacheService
+	nats  QueueService
 	s3    S3Service
 	smtp  EmailService
 }
@@ -46,6 +52,7 @@ func New(
 	au auth.Core,
 	repo AppRepo,
 	cache CacheService,
+	nats QueueService,
 	s3 S3Service,
 	smtp EmailService,
 ) *Controller {
@@ -53,6 +60,7 @@ func New(
 		au:    au,
 		repo:  repo,
 		cache: cache,
+		nats:  nats,
 		s3:    s3,
 		smtp:  smtp,
 	}

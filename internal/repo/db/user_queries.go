@@ -1,24 +1,5 @@
 package db
 
-const userSelectQ = `
-SELECT COUNT(DISTINCT u.id)
-FROM users u
-`
-
-const userListQ = `
-SELECT 
-	u.id, 
-	u.name, 
-	u.email, 
-	u.avatar,
-	u.is_active,
-	u.is_email_verified,
-	u.created_at, 
-	u.updated_at
-FROM users u
-LIMIT $1 OFFSET $2
-`
-
 const userGetByIDQ = `
 SELECT 
 	u.id, 

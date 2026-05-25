@@ -5,6 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
@@ -17,10 +22,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-	"time"
 )
 
 func TestHandler_ListDevices(t *testing.T) {

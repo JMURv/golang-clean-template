@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/JMURv/golang-clean-template/internal/cache"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/dto"
 	md "github.com/JMURv/golang-clean-template/internal/models"
@@ -17,11 +18,7 @@ import (
 
 type userCtrl interface {
 	IsUserExist(ctx context.Context, email string) (*dto.ExistsUserResponse, error)
-	ListUsers(
-		ctx context.Context,
-		page, size int,
-		filters map[string]any,
-	) (*dto.PaginatedUserResponse, error)
+	ListUsers(ctx context.Context, page, size int, filters map[string]any) (*dto.PaginatedUserResponse, error)
 	GetUserByID(ctx context.Context, userID uuid.UUID) (*md.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*md.User, error)
 	CreateUser(
@@ -29,21 +26,12 @@ type userCtrl interface {
 		u *dto.CreateUserRequest,
 		file *s3.UploadFileRequest,
 	) (*dto.CreateUserResponse, error)
-	UpdateUser(
-		ctx context.Context,
-		id uuid.UUID,
-		req *dto.UpdateUserRequest,
-		file *s3.UploadFileRequest,
-	) error
+	UpdateUser(ctx context.Context, id uuid.UUID, req *dto.UpdateUserRequest, file *s3.UploadFileRequest) error
 	DeleteUser(ctx context.Context, userID uuid.UUID) error
 }
 
 type userRepo interface {
-	ListUsers(
-		ctx context.Context,
-		page, size int,
-		filters map[string]any,
-	) (*dto.PaginatedUserResponse, error)
+	ListUsers(ctx context.Context, page, size int, filters map[string]any) (*dto.PaginatedUserResponse, error)
 	GetUserByID(ctx context.Context, userID uuid.UUID) (*md.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*md.User, error)
 	CreateUser(ctx context.Context, req *dto.CreateUserRequest) (uuid.UUID, error)
@@ -51,16 +39,7 @@ type userRepo interface {
 	DeleteUser(ctx context.Context, userID uuid.UUID) error
 }
 
-const (
-	userCacheKey = "user:%v"
-	usersListKey = "users-list:%v:%v:%v"
-	userPattern  = "users-*"
-)
-
-func (c *Controller) IsUserExist(
-	ctx context.Context,
-	email string,
-) (*dto.ExistsUserResponse, error) {
+func (c *Controller) IsUserExist(ctx context.Context, email string) (*dto.ExistsUserResponse, error) {
 	const op = "users.IsUserExist.ctrl"
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, op)
@@ -92,7 +71,8 @@ func (c *Controller) ListUsers(
 	defer span.Finish()
 
 	cached := &dto.PaginatedUserResponse{}
-	cacheKey := fmt.Sprintf(usersListKey, page, size, filters)
+
+	cacheKey := fmt.Sprintf(cache.UsersListKey, page, size, filters)
 	if err := c.cache.GetToStruct(ctx, cacheKey, &cached); err == nil {
 		return cached, nil
 	}
@@ -115,7 +95,8 @@ func (c *Controller) GetUserByID(ctx context.Context, userID uuid.UUID) (*md.Use
 	defer span.Finish()
 
 	cached := &md.User{}
-	cacheKey := fmt.Sprintf(userCacheKey, userID)
+
+	cacheKey := fmt.Sprintf(cache.User, userID)
 	if err := c.cache.GetToStruct(ctx, cacheKey, cached); err == nil {
 		return cached, nil
 	}
@@ -143,7 +124,8 @@ func (c *Controller) GetUserByEmail(ctx context.Context, email string) (*md.User
 	defer span.Finish()
 
 	cached := &md.User{}
-	cacheKey := fmt.Sprintf(userCacheKey, email)
+
+	cacheKey := fmt.Sprintf(cache.User, email)
 	if err := c.cache.GetToStruct(ctx, cacheKey, cached); err == nil {
 		return cached, nil
 	}
@@ -197,7 +179,7 @@ func (c *Controller) CreateUser(
 		return nil, err
 	}
 
-	go c.cache.InvalidateKeysByPattern(ctx, userPattern)
+	go c.cache.InvalidateKeysByPattern(ctx, cache.UserPattern)
 
 	return &dto.CreateUserResponse{
 		ID: id,
@@ -232,8 +214,8 @@ func (c *Controller) UpdateUser(
 		return err
 	}
 
-	c.cache.Delete(ctx, fmt.Sprintf(userCacheKey, id))
-	go c.cache.InvalidateKeysByPattern(ctx, userPattern)
+	c.cache.Delete(ctx, fmt.Sprintf(cache.User, id))
+	go c.cache.InvalidateKeysByPattern(ctx, cache.UserPattern)
 	return nil
 }
 
@@ -251,7 +233,7 @@ func (c *Controller) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 		return err
 	}
 
-	c.cache.Delete(ctx, fmt.Sprintf(userCacheKey, userID))
-	go c.cache.InvalidateKeysByPattern(ctx, userPattern)
+	c.cache.Delete(ctx, fmt.Sprintf(cache.User, userID))
+	go c.cache.InvalidateKeysByPattern(ctx, cache.UserPattern)
 	return nil
 }

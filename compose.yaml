@@ -12,7 +12,7 @@ services:
 
   db:
     container_name: db
-    image: postgres:17.4-alpine
+    image: postgres:18.1-alpine
     restart: always
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
@@ -53,7 +53,28 @@ services:
       start_period: 2s
     networks: [ app-template-prod ]
 
+  nats:
+    container_name: nats
+    image: nats:2.10.14-alpine
+    restart: unless-stopped
+    command: "-js -m 8222"
+    ports:
+      - "${NATS_PORT}:4222"
+      - "${NATS_MONITOR_PORT}:8222"
+    environment:
+      NATS_USER: ${NATS_USER}
+      NATS_PASSWORD: ${NATS_PASSWORD}
+    volumes:
+      - nats_data_prod:/data
+    healthcheck:
+      test: wget http://localhost:8222/healthz -q -S -O -
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks: [ app-template-prod ]
+
   backend:
+    profiles: ["app"]
     container_name: backend
     restart: unless-stopped
     image: app-template-backend:latest
@@ -195,6 +216,7 @@ volumes:
   pg_data_prod:
   minio_data_prod:
   redis_data_prod:
+  nats_data_prod:
   prometheus_data_prod:
   grafana_data_prod:
   loki_data_prod:

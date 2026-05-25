@@ -5,7 +5,6 @@ import "errors"
 var (
 	ErrInternal      = errors.New("internal error")
 	ErrDecodeRequest = errors.New("decode request")
-	ErrFileTooLarge  = errors.New("file too large")
 )
 
 var (

@@ -24,6 +24,14 @@ services:
       - minio_data_dev:/data
     networks: !override [ app-template-dev ]
 
+  nats:
+    extends:
+      file: compose.yaml
+      service: nats
+    volumes: !override
+      - nats_data_dev:/data
+    networks: !override [ app-template-dev ]
+
   backend:
     image: app-template-backend:latest-dev
     build:
@@ -105,6 +113,7 @@ volumes:
   pg_data_dev:
   minio_data_dev:
   redis_data_dev:
+  nats_data_dev:
   prometheus_data_dev:
   grafana_data_dev:
   loki_data_dev:

@@ -3,6 +3,9 @@ package ctrl
 import (
 	"context"
 	"errors"
+	"testing"
+	"time"
+
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/auth/jwt"
 	"github.com/JMURv/golang-clean-template/internal/dto"
@@ -12,8 +15,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	"testing"
-	"time"
 )
 
 func TestController_Authenticate(t *testing.T) {
@@ -23,10 +24,11 @@ func TestController_Authenticate(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
 	testDevice := &dto.DeviceRequest{
@@ -161,10 +163,11 @@ func TestController_Refresh(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
 	testDevice := &dto.DeviceRequest{
@@ -346,10 +349,11 @@ func TestController_Logout(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
 

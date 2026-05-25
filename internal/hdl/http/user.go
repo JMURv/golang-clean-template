@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/JMURv/golang-clean-template/internal/config"
-	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/dto"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	mid "github.com/JMURv/golang-clean-template/internal/hdl/http/middleware"
@@ -49,11 +48,7 @@ func (h *Handler) existsUser(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.ctrl.IsUserExist(r.Context(), req.Email)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-		utils.ErrResponse(w, http.StatusInternalServerError, err)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -78,7 +73,7 @@ func (h *Handler) listUsers(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.ctrl.ListUsers(r.Context(), page, size, filters)
 	if err != nil {
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -109,11 +104,7 @@ func (h *Handler) getMe(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.ctrl.GetUserByID(r.Context(), uid)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -147,11 +138,7 @@ func (h *Handler) getUser(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.ctrl.GetUserByID(r.Context(), uid)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -204,12 +191,7 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.ctrl.CreateUser(r.Context(), req, fileReq)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrAlreadyExists) {
-			utils.ErrResponse(w, http.StatusConflict, err)
-			return
-		}
-
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -274,11 +256,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 
 	err = h.ctrl.UpdateUser(r.Context(), uid, req, fileReq)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 
@@ -312,11 +290,7 @@ func (h *Handler) deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	err = h.ctrl.DeleteUser(r.Context(), uid)
 	if err != nil {
-		if errors.Is(err, ctrl.ErrNotFound) {
-			utils.ErrResponse(w, http.StatusNotFound, err)
-			return
-		}
-		utils.ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
+		utils.HandleError(w, err)
 		return
 	}
 

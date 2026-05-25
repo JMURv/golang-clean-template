@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/JMURv/golang-clean-template/internal/cache"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/dto"
@@ -15,7 +17,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	"testing"
 )
 
 func TestController_IsUserExist(t *testing.T) {
@@ -25,10 +26,11 @@ func TestController_IsUserExist(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testEmail := "test@example.com"
 	expectedResponse := &dto.ExistsUserResponse{Exists: true}
@@ -105,15 +107,16 @@ func TestController_ListUsers(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	page := 1
 	size := 10
-	filters := map[string]interface{}{"active": true}
-	cacheKey := fmt.Sprintf(usersListKey, page, size, filters)
+	filters := map[string]any{"active": true}
+	cacheKey := fmt.Sprintf(cache.UsersListKey, page, size, filters)
 
 	successResponse := &dto.PaginatedUserResponse{
 		Data: []*md.User{
@@ -128,7 +131,7 @@ func TestController_ListUsers(t *testing.T) {
 		setup    func()
 		page     int
 		size     int
-		filters  map[string]interface{}
+		filters  map[string]any
 		expected *dto.PaginatedUserResponse
 		wantErr  bool
 	}{
@@ -137,7 +140,7 @@ func TestController_ListUsers(t *testing.T) {
 			setup: func() {
 				mockCache.EXPECT().
 					GetToStruct(gomock.Any(), cacheKey, gomock.Any()).
-					DoAndReturn(func(ctx context.Context, key string, dest interface{}) error {
+					DoAndReturn(func(ctx context.Context, key string, dest any) error {
 						return nil
 					})
 			},
@@ -213,13 +216,14 @@ func TestController_GetUserByID(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
-	cacheKey := fmt.Sprintf(userCacheKey, testUserID)
+	cacheKey := fmt.Sprintf(cache.User, testUserID)
 	testUser := &md.User{
 		ID:    testUserID,
 		Name:  "Test User",
@@ -239,7 +243,7 @@ func TestController_GetUserByID(t *testing.T) {
 			setup: func() {
 				mockCache.EXPECT().
 					GetToStruct(gomock.Any(), cacheKey, gomock.Any()).
-					DoAndReturn(func(ctx context.Context, key string, dest interface{}) error {
+					DoAndReturn(func(ctx context.Context, key string, dest any) error {
 						return nil
 					})
 			},
@@ -328,13 +332,14 @@ func TestController_GetUserByEmail(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testEmail := "test@example.com"
-	cacheKey := fmt.Sprintf(userCacheKey, testEmail)
+	cacheKey := fmt.Sprintf(cache.User, testEmail)
 	testUser := &md.User{
 		ID:    uuid.New(),
 		Name:  "Test User",
@@ -354,7 +359,7 @@ func TestController_GetUserByEmail(t *testing.T) {
 			setup: func() {
 				mockCache.EXPECT().
 					GetToStruct(gomock.Any(), cacheKey, gomock.Any()).
-					DoAndReturn(func(ctx context.Context, key string, dest interface{}) error {
+					DoAndReturn(func(ctx context.Context, key string, dest any) error {
 						return nil
 					})
 			},
@@ -443,10 +448,11 @@ func TestController_CreateUser(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	// Test data
 	testUserID := uuid.New()
@@ -494,7 +500,7 @@ func TestController_CreateUser(t *testing.T) {
 					Return(testUserID, nil)
 
 				mockCache.EXPECT().
-					InvalidateKeysByPattern(gomock.Any(), userPattern).AnyTimes().Return()
+					InvalidateKeysByPattern(gomock.Any(), cache.UserPattern).AnyTimes().Return()
 			},
 			request: baseRequest,
 			file:    &s3.UploadFileRequest{},
@@ -519,7 +525,7 @@ func TestController_CreateUser(t *testing.T) {
 					Return(testUserID, nil)
 
 				mockCache.EXPECT().
-					InvalidateKeysByPattern(gomock.Any(), userPattern).AnyTimes().Return()
+					InvalidateKeysByPattern(gomock.Any(), cache.UserPattern).AnyTimes().Return()
 			},
 			request: baseRequest,
 			file:    testFile,
@@ -619,10 +625,11 @@ func TestController_UpdateUser(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
 	testAvatarURL := "https://example.com/avatar.jpg"
@@ -652,11 +659,11 @@ func TestController_UpdateUser(t *testing.T) {
 					Return(nil)
 
 				mockCache.EXPECT().
-					Delete(gomock.Any(), fmt.Sprintf(userCacheKey, testUserID)).
+					Delete(gomock.Any(), fmt.Sprintf(cache.User, testUserID)).
 					Return()
 
 				mockCache.EXPECT().
-					InvalidateKeysByPattern(gomock.Any(), userPattern).
+					InvalidateKeysByPattern(gomock.Any(), cache.UserPattern).
 					Return().AnyTimes()
 			},
 			id:      testUserID,
@@ -679,11 +686,11 @@ func TestController_UpdateUser(t *testing.T) {
 					})
 
 				mockCache.EXPECT().
-					Delete(gomock.Any(), fmt.Sprintf(userCacheKey, testUserID)).
+					Delete(gomock.Any(), fmt.Sprintf(cache.User, testUserID)).
 					Return()
 
 				mockCache.EXPECT().
-					InvalidateKeysByPattern(gomock.Any(), userPattern).
+					InvalidateKeysByPattern(gomock.Any(), cache.UserPattern).
 					Return().AnyTimes()
 			},
 			id:      testUserID,
@@ -757,14 +764,15 @@ func TestController_DeleteUser(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	// Test data
 	testUserID := uuid.New()
-	cacheKey := fmt.Sprintf(userCacheKey, testUserID)
+	cacheKey := fmt.Sprintf(cache.User, testUserID)
 
 	tests := []struct {
 		name    string
@@ -785,7 +793,7 @@ func TestController_DeleteUser(t *testing.T) {
 					Return()
 
 				mockCache.EXPECT().
-					InvalidateKeysByPattern(gomock.Any(), userPattern).
+					InvalidateKeysByPattern(gomock.Any(), cache.UserPattern).
 					Return().AnyTimes()
 			},
 			userID:  testUserID,

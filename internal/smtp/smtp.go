@@ -15,7 +15,7 @@ type EmailServer struct {
 	user         string
 	pass         string
 	admin        string
-	serverConfig config.ServerConfig
+	serverConfig config.Server
 }
 
 func New(conf config.Config) *EmailServer {

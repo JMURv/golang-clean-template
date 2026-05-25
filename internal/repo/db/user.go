@@ -247,8 +247,7 @@ func (r *Repository) CreateUser(
 		req.IsEmail,
 	).Scan(&id)
 	if err != nil {
-		trgtErr := &pgconn.PgError{}
-		if errors.As(err, &trgtErr) {
+		if trgtErr, ok := errors.AsType[*pgconn.PgError](err); ok {
 			if trgtErr.Code == "23505" {
 				zap.L().Debug(
 					"user already exists",

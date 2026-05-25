@@ -14,7 +14,6 @@ const (
 	DefaultPage      = 1
 	DefaultSize      = 40
 	DefaultCacheTime = time.Hour
-	MinCacheTime     = time.Minute * 5
 	MaxMemory        = 10 << 20 // 10 MB
 )
 

@@ -3,6 +3,8 @@ package ctrl
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/JMURv/golang-clean-template/internal/dto"
 	md "github.com/JMURv/golang-clean-template/internal/models"
 	"github.com/JMURv/golang-clean-template/internal/repo"
@@ -10,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	"testing"
 )
 
 func TestController_ListDevices(t *testing.T) {
@@ -20,10 +21,11 @@ func TestController_ListDevices(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
 	testDevices := []md.Device{
@@ -111,10 +113,11 @@ func TestController_GetDevice(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
 	testDeviceID := uuid.New().String()
@@ -199,10 +202,11 @@ func TestController_GetDeviceByID(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testDeviceID := uuid.New().String()
 	testDevice := &md.Device{
@@ -282,10 +286,11 @@ func TestController_UpdateDevice(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
 	testDeviceID := uuid.New().String()
@@ -368,10 +373,11 @@ func TestController_DeleteDevice(t *testing.T) {
 	mockAuth := mocks.NewMockCore(ctrlMock)
 	mockRepo := mocks.NewMockAppRepo(ctrlMock)
 	mockCache := mocks.NewMockCacheService(ctrlMock)
+	mockQueue := mocks.NewMockQueueService(ctrlMock)
 	mockS3 := mocks.NewMockS3Service(ctrlMock)
 
 	ctx := context.Background()
-	ctrl := New(mockAuth, mockRepo, mockCache, mockS3, nil)
+	ctrl := New(mockAuth, mockRepo, mockCache, mockQueue, mockS3, nil)
 
 	testUserID := uuid.New()
 	testDeviceID := uuid.New().String()

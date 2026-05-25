@@ -11,7 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/config"
+	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/dto"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	"github.com/JMURv/golang-clean-template/internal/hdl/validation"
@@ -210,4 +212,28 @@ func ParseFileField(r *http.Request, fieldName string, fileReq *s3.UploadFileReq
 	}
 
 	return nil
+}
+
+func HandleError(w http.ResponseWriter, err error) {
+	if errors.Is(err, ctrl.ErrNotFound) {
+		ErrResponse(w, http.StatusNotFound, err)
+		return
+	}
+
+	if errors.Is(err, ctrl.ErrAlreadyExists) {
+		ErrResponse(w, http.StatusConflict, err)
+		return
+	}
+
+	if errors.Is(err, auth.ErrTokenRevoked) {
+		ErrResponse(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if errors.Is(err, auth.ErrInvalidCredentials) {
+		ErrResponse(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	ErrResponse(w, http.StatusInternalServerError, hdl.ErrInternal)
 }

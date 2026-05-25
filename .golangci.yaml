@@ -18,7 +18,12 @@ linters:
     - funlen
     - exhaustruct
     - dupword
+    - ireturn
   settings:
+    ireturn:
+      allow:
+        - HandlerT
+
     wsl_v5:
       allow-first-in-block: true
       allow-whole-block: false
@@ -28,15 +33,18 @@ linters:
     errcheck:
       check-type-assertions: true
       check-blank: true
-    gocyclo:
-      min-complexity: 11
+    cyclop:
+      max-complexity: 10
 
   exclusions:
     generated: lax
     rules:
       - linters:
-          - gocyclo
+          - cyclop
         path: _test\.go
+      - linters:
+          - cyclop
+        path: setup\.go
     paths:
       - third_party$
       - builtin$
@@ -61,6 +69,8 @@ formatters:
       rewrite-rules:
         - pattern: 'interface{}'
           replacement: 'any'
+    golines:
+      max-len: 120
   exclusions:
     generated: lax
     paths:

@@ -3,23 +3,21 @@ package http
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDeviceRoutes(t *testing.T) {
-	ts, cleanup := setupTestServer()
-	t.Cleanup(func() {
-		cleanup(t)
-	})
+	ts := NewTestEnv(t)
 
 	_, userData := createTestUser(t, ts)
 	access, _ := loginUser(t, ts, userData)
 
 	// List devices of the newly created user
-	req, err := http.NewRequest("GET", ts.URL+"/device", nil)
+	req, err := http.NewRequest("GET", ts.Server.URL+"/device", nil)
 	require.NoError(t, err)
 
 	req.AddCookie(access)
@@ -38,7 +36,7 @@ func TestDeviceRoutes(t *testing.T) {
 
 	// Get first device from list
 	t.Run("Get created device", func(t *testing.T) {
-		req, err := http.NewRequest("GET", ts.URL+"/device/"+dID, nil)
+		req, err := http.NewRequest("GET", ts.Server.URL+"/device/"+dID, nil)
 		require.NoError(t, err)
 		req.AddCookie(access)
 
@@ -61,7 +59,7 @@ func TestDeviceRoutes(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		req, err := http.NewRequest("PUT", ts.URL+"/device/"+dID, bytes.NewReader(updateBody))
+		req, err := http.NewRequest("PUT", ts.Server.URL+"/device/"+dID, bytes.NewReader(updateBody))
 		require.NoError(t, err)
 		req.AddCookie(access)
 
@@ -71,7 +69,7 @@ func TestDeviceRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		// Check update was success
-		req, err = http.NewRequest("GET", ts.URL+"/device/"+dID, nil)
+		req, err = http.NewRequest("GET", ts.Server.URL+"/device/"+dID, nil)
 		require.NoError(t, err)
 		req.AddCookie(access)
 
@@ -90,7 +88,7 @@ func TestDeviceRoutes(t *testing.T) {
 
 	// 5. Получаем список устройств (LIST)
 	t.Run("List devices", func(t *testing.T) {
-		req, err := http.NewRequest("GET", ts.URL+"/device", nil)
+		req, err := http.NewRequest("GET", ts.Server.URL+"/device", nil)
 		require.NoError(t, err)
 		req.AddCookie(access)
 
@@ -108,7 +106,7 @@ func TestDeviceRoutes(t *testing.T) {
 
 	// Delete device
 	t.Run("Delete device", func(t *testing.T) {
-		req, err := http.NewRequest("DELETE", ts.URL+"/device/"+dID, nil)
+		req, err := http.NewRequest("DELETE", ts.Server.URL+"/device/"+dID, nil)
 		require.NoError(t, err)
 		req.AddCookie(access)
 
@@ -117,7 +115,7 @@ func TestDeviceRoutes(t *testing.T) {
 		defer resp.Body.Close()
 		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
 
-		req, err = http.NewRequest("GET", ts.URL+"/device/"+dID, nil)
+		req, err = http.NewRequest("GET", ts.Server.URL+"/device/"+dID, nil)
 		require.NoError(t, err)
 		req.AddCookie(access)
 

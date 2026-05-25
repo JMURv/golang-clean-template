@@ -663,3 +663,41 @@ func (mr *MockCacheServiceMockRecorder) Set(ctx, t, key, val any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockCacheService)(nil).Set), ctx, t, key, val)
 }
+
+// MockQueueService is a mock of QueueService interface.
+type MockQueueService struct {
+	ctrl     *gomock.Controller
+	recorder *MockQueueServiceMockRecorder
+	isgomock struct{}
+}
+
+// MockQueueServiceMockRecorder is the mock recorder for MockQueueService.
+type MockQueueServiceMockRecorder struct {
+	mock *MockQueueService
+}
+
+// NewMockQueueService creates a new mock instance.
+func NewMockQueueService(ctrl *gomock.Controller) *MockQueueService {
+	mock := &MockQueueService{ctrl: ctrl}
+	mock.recorder = &MockQueueServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockQueueService) EXPECT() *MockQueueServiceMockRecorder {
+	return m.recorder
+}
+
+// Publish mocks base method.
+func (m *MockQueueService) Publish(subject string, payload any, uid uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Publish", subject, payload, uid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Publish indicates an expected call of Publish.
+func (mr *MockQueueServiceMockRecorder) Publish(subject, payload, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*MockQueueService)(nil).Publish), subject, payload, uid)
+}

@@ -31,11 +31,11 @@ func Auth(au auth.Core, opts AuthOpts) func(http.Handler) http.Handler {
 					if errors.Is(err, http.ErrNoCookie) {
 						utils.ErrResponse(w, http.StatusUnauthorized, err)
 						return
-					} else {
-						zap.L().Error("failed to get access cookie", zap.Error(err))
-						utils.ErrResponse(w, http.StatusInternalServerError, err)
-						return
 					}
+
+					zap.L().Error("failed to get access cookie", zap.Error(err))
+					utils.ErrResponse(w, http.StatusInternalServerError, err)
+					return
 				}
 
 				claims, err := au.ParseClaims(r.Context(), access.Value)

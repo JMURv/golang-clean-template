@@ -3,28 +3,25 @@ package http
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"os"
+	"path/filepath"
+	"testing"
+
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io"
-	"mime/multipart"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 func TestUserRoutes(t *testing.T) {
-	ts, cleanup := setupTestServer()
-	t.Cleanup(func() {
-		cleanup(t)
-	})
+	ts := NewTestEnv(t)
 
 	t.Run("Test health endpoint", func(t *testing.T) {
-		resp, err := http.Get(ts.URL + "/health")
+		resp, err := http.Get(ts.Server.URL + "/health")
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
@@ -36,7 +33,7 @@ func TestUserRoutes(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.NoError(t, err)
 
-		resp, err := http.Post(ts.URL+"/users/exists", "application/json", bytes.NewBuffer(body))
+		resp, err := http.Post(ts.Server.URL+"/users/exists", "application/json", bytes.NewBuffer(body))
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
@@ -74,7 +71,7 @@ func TestUserRoutes(t *testing.T) {
 		require.NoError(t, err)
 		writer.Close()
 
-		resp, err := http.Post(ts.URL+"/users", writer.FormDataContentType(), body)
+		resp, err := http.Post(ts.Server.URL+"/users", writer.FormDataContentType(), body)
 		require.NoError(t, err)
 		defer resp.Body.Close()
 		assert.Equal(t, http.StatusCreated, resp.StatusCode)
@@ -88,7 +85,7 @@ func TestUserRoutes(t *testing.T) {
 	t.Run("Test getUser endpoint", func(t *testing.T) {
 		userID, _ := createTestUser(t, ts)
 
-		resp, err := http.Get(ts.URL + "/users/" + userID.String())
+		resp, err := http.Get(ts.Server.URL + "/users/" + userID.String())
 		require.NoError(t, err)
 		defer resp.Body.Close()
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -103,7 +100,7 @@ func TestUserRoutes(t *testing.T) {
 		createTestUser(t, ts)
 		createTestUser(t, ts)
 
-		resp, err := http.Get(ts.URL + "/users?page=1&size=10")
+		resp, err := http.Get(ts.Server.URL + "/users?page=1&size=10")
 		require.NoError(t, err)
 		defer resp.Body.Close()
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -121,7 +118,7 @@ func TestUserRoutes(t *testing.T) {
 		updateBody := &bytes.Buffer{}
 		writer := multipart.NewWriter(updateBody)
 
-		updateData := map[string]interface{}{
+		updateData := map[string]any{
 			"name":  "Updated Name",
 			"email": "updated@example.com",
 		}
@@ -132,7 +129,7 @@ func TestUserRoutes(t *testing.T) {
 		require.NoError(t, err)
 		writer.Close()
 
-		req, err := http.NewRequest("PUT", ts.URL+"/users/"+userID.String(), updateBody)
+		req, err := http.NewRequest("PUT", ts.Server.URL+"/users/"+userID.String(), updateBody)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 		req.AddCookie(access)
@@ -149,7 +146,7 @@ func TestUserRoutes(t *testing.T) {
 		userID, userData := createTestUser(t, ts)
 		access, _ := loginUser(t, ts, userData)
 
-		req, err := http.NewRequest("DELETE", ts.URL+"/users/"+userID.String(), nil)
+		req, err := http.NewRequest("DELETE", ts.Server.URL+"/users/"+userID.String(), nil)
 		require.NoError(t, err)
 		req.AddCookie(access)
 
@@ -160,7 +157,7 @@ func TestUserRoutes(t *testing.T) {
 
 		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
 
-		resp, err = http.Get(ts.URL + "/users/" + userID.String())
+		resp, err = http.Get(ts.Server.URL + "/users/" + userID.String())
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
@@ -168,7 +165,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 }
 
-func createTestUser(t *testing.T, ts *httptest.Server) (uuid.UUID, map[string]any) {
+func createTestUser(t *testing.T, ts *TestEnv) (uuid.UUID, map[string]any) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
@@ -184,7 +181,7 @@ func createTestUser(t *testing.T, ts *httptest.Server) (uuid.UUID, map[string]an
 	writer.Close()
 	require.NoError(t, err)
 
-	resp, err := http.Post(ts.URL+"/users", writer.FormDataContentType(), body)
+	resp, err := http.Post(ts.Server.URL+"/users", writer.FormDataContentType(), body)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
@@ -199,7 +196,7 @@ func createTestUser(t *testing.T, ts *httptest.Server) (uuid.UUID, map[string]an
 	return userID, userData
 }
 
-func loginUser(t *testing.T, ts *httptest.Server, userData map[string]any) (*http.Cookie, *http.Cookie) {
+func loginUser(t *testing.T, ts *TestEnv, userData map[string]any) (*http.Cookie, *http.Cookie) {
 	loginData := map[string]any{
 		"email":    userData["email"],
 		"password": userData["password"],
@@ -208,7 +205,7 @@ func loginUser(t *testing.T, ts *httptest.Server, userData map[string]any) (*htt
 	data, err := json.Marshal(loginData)
 	require.NoError(t, err)
 
-	resp, err := http.Post(ts.URL+"/auth/jwt", "application/json", bytes.NewReader(data))
+	resp, err := http.Post(ts.Server.URL+"/auth/jwt", "application/json", bytes.NewReader(data))
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
