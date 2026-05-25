@@ -55,11 +55,7 @@ func ErrResponse(w http.ResponseWriter, statusCode int, err error) {
 		msgs = append(msgs, err.Error())
 	}
 
-	if err := json.NewEncoder(w).Encode(
-		&ErrorsResponse{
-			Errors: msgs,
-		},
-	); err != nil {
+	if err := json.NewEncoder(w).Encode(&ErrorsResponse{Errors: msgs}); err != nil {
 		zap.L().Error("failed to encode err response", zap.Error(err))
 		return
 	}

@@ -57,9 +57,7 @@ func (c *Controller) GenPair(
 		return res, err
 	}
 
-	device := auth.GenerateDevice(d)
-
-	err = c.repo.CreateToken(ctx, uid, refresh, c.au.GetRefreshTime(), &device)
+	err = c.repo.CreateToken(ctx, uid, refresh, c.au.GetRefreshTime(), new(auth.GenerateDevice(d)))
 	if err != nil {
 		return res, err
 	}
