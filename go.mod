@@ -26,7 +26,6 @@ require (
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.6
 	github.com/testcontainers/testcontainers-go v0.42.0
-	github.com/testcontainers/testcontainers-go/modules/postgres v0.42.0
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	go.uber.org/mock v0.6.0
 	go.uber.org/zap v1.28.0
