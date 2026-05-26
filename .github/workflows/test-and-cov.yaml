@@ -22,9 +22,6 @@ jobs:
       - name: Install gocovmerge
         run: go install github.com/wadey/gocovmerge@latest
 
-      - name: Run repository tests
-        run: go test -coverprofile=cov_repo.out ./internal/repo/db
-
       - name: Run controller tests
         run: go test -coverprofile=cov_ctrl.out ./internal/ctrl
 
@@ -34,8 +31,11 @@ jobs:
       - name: Run gRPC handler tests
         run: go test -coverprofile=cov_grpc.out ./internal/hdl/grpc
 
+      - name: Run integration tests
+        run: go test ./tests/integration/...
+
       - name: Merge coverage reports
-        run: gocovmerge cov_repo.out cov_ctrl.out cov_http.out cov_grpc.out > coverage.out
+        run: gocovmerge cov_ctrl.out cov_http.out cov_grpc.out > coverage.out
 
       - name: Update coverage report
         uses: ncruces/go-coverage-report@v0

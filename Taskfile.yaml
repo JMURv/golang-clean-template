@@ -170,7 +170,6 @@ tasks:
     cmds:
       - "task t-hdl"
       - "task t-ctrl"
-      - "task t-repo"
       - "task t-integration"
 
   t-hdl:
@@ -196,12 +195,6 @@ tasks:
     cmds:
       - "go test ./internal/ctrl -v"
       - "go test -coverprofile=cov_ctrl.out ./internal/ctrl && go tool cover -func=cov_ctrl.out"
-
-  t-repo:
-    desc: Run repo tests
-    cmds:
-      - "go test ./internal/repo/db -v"
-      - "go test -coverprofile=cov_repo.out ./internal/repo/db && go tool cover -func=cov_repo.out"
 
   t-integration:
     desc: Run integration tests
