@@ -13,6 +13,7 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/cache/redis"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
+	"github.com/JMURv/golang-clean-template/internal/dto/validation"
 	hdl "github.com/JMURv/golang-clean-template/internal/hdl/http"
 	"github.com/JMURv/golang-clean-template/internal/queue"
 	"github.com/JMURv/golang-clean-template/internal/repo/db"
@@ -169,6 +170,7 @@ func NewTestEnv(t *testing.T) *TestEnv {
 		filepath.Join(rootDir, "migrations"),
 	))
 
+	validation.New()
 	conf := config.MustLoad(
 		filepath.ToSlash(
 			filepath.Join(rootDir, "build", "configs", "envs", ".env.integration"),

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
@@ -13,15 +14,24 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
 	"github.com/JMURv/golang-clean-template/internal/dto"
+	"github.com/JMURv/golang-clean-template/internal/dto/validation"
 	"github.com/JMURv/golang-clean-template/internal/hdl"
 	"github.com/JMURv/golang-clean-template/internal/hdl/http/utils"
 	"github.com/JMURv/golang-clean-template/tests/mocks"
+	"github.com/go-playground/validator/v10"
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"go.uber.org/zap"
 )
+
+func TestMain(m *testing.M) {
+	zap.ReplaceGlobals(zap.Must(zap.NewDevelopment()))
+	validation.V = validator.New()
+	os.Exit(m.Run())
+}
 
 func TestHandler_Authenticate(t *testing.T) {
 	const uri = "/auth/jwt"

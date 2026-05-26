@@ -3,19 +3,29 @@ package ctrl
 import (
 	"context"
 	"errors"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/JMURv/golang-clean-template/internal/auth"
 	"github.com/JMURv/golang-clean-template/internal/auth/jwt"
 	"github.com/JMURv/golang-clean-template/internal/dto"
+	"github.com/JMURv/golang-clean-template/internal/dto/validation"
 	"github.com/JMURv/golang-clean-template/internal/models"
 	"github.com/JMURv/golang-clean-template/internal/repo"
 	"github.com/JMURv/golang-clean-template/tests/mocks"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+	"go.uber.org/zap"
 )
+
+func TestMain(m *testing.M) {
+	zap.ReplaceGlobals(zap.Must(zap.NewDevelopment()))
+	validation.V = validator.New()
+	os.Exit(m.Run())
+}
 
 func TestController_Authenticate(t *testing.T) {
 	ctrlMock := gomock.NewController(t)
