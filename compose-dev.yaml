@@ -63,7 +63,7 @@ services:
       service: prometheus
       file: compose.yaml
     volumes: !override
-      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./build/configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data_dev:/prometheus
     networks: !override [ app-template-dev ]
 
@@ -79,7 +79,7 @@ services:
       file: compose.yaml
     volumes: !override
       - grafana_data_dev:/var/lib/grafana
-      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./build/configs/grafana/provisioning:/etc/grafana/provisioning:ro
     networks: !override [ app-template-dev ]
 
   loki:
@@ -88,7 +88,7 @@ services:
       file: compose.yaml
     volumes: !override
       - loki_data_dev:/loki
-      - ./configs/loki:/etc/loki
+      - ./build/configs/loki:/etc/loki
     networks: !override [ app-template-dev ]
 
   promtail:

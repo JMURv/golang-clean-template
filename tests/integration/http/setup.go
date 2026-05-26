@@ -157,7 +157,6 @@ type TestEnv struct {
 	Minio    testcontainers.Container
 	Nats     testcontainers.Container
 
-	Config config.Config
 	Server *httptest.Server
 }
 
@@ -268,9 +267,7 @@ func NewTestEnv(t *testing.T) *TestEnv {
 		t.Fatal(err)
 	}
 
-	env.Config = conf
-	env.Server = getServer(env.Config)
-
+	env.Server = getServer(conf)
 	t.Cleanup(func() {
 		env.Teardown(ctx, t)
 	})

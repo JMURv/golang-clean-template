@@ -14,6 +14,13 @@ services:
     volumes: !reset []
     networks: !override [ app-template-k6 ]
 
+  nats:
+    extends:
+      service: nats
+      file: compose.yaml
+    volumes: !reset []
+    networks: !override [ app-template-k6 ]
+
   db:
     extends:
       service: db
@@ -34,7 +41,7 @@ services:
     container_name: k6
     image: grafana/k6:1.1.0
     volumes:
-      - ../tests/load/script.js:/scripts/script.js
+      - ./tests/load/script.js:/scripts/script.js
     environment:
       - K6_OUT=${K6_OUT}
       - K6_PROMETHEUS_RW_SERVER_URL=${K6_PROMETHEUS_RW_SERVER_URL}

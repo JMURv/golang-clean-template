@@ -133,7 +133,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./build/configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     networks: [ app-template-prod ]
 
@@ -157,7 +157,7 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./build/configs/grafana/provisioning:/etc/grafana/provisioning:ro
     networks: [ app-template-prod ]
 
   loki:
@@ -170,7 +170,7 @@ services:
     command: -config.file=/etc/loki/loki-config.yaml
     volumes:
       - loki_data:/loki
-      - ./configs/loki:/etc/loki
+      - ./build/configs/loki:/etc/loki
     networks: [ app-template-prod ]
 
   promtail:
@@ -179,7 +179,7 @@ services:
     restart: unless-stopped
     profiles: ["observe"]
     volumes:
-      - ./configs/promtail:/etc/promtail
+      - ./build/configs/promtail:/etc/promtail
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/promtail-config.yaml

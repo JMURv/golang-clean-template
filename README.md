@@ -146,11 +146,10 @@ task k-down
 ```
 
 ## Tests
-### Integration
-Run:
 ```shell
-task t-integration
+task t
 ```
+Will run all unit and integration tests. 
 It will spin up all containers for integration testing automatically using `testcontainers`.
 
 ### Load testing 
