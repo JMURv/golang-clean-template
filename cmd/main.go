@@ -11,6 +11,7 @@ import (
 	"github.com/JMURv/golang-clean-template/internal/cache/redis"
 	"github.com/JMURv/golang-clean-template/internal/config"
 	"github.com/JMURv/golang-clean-template/internal/ctrl"
+	"github.com/JMURv/golang-clean-template/internal/dto/validation"
 	"github.com/JMURv/golang-clean-template/internal/hdl/grpc"
 	"github.com/JMURv/golang-clean-template/internal/hdl/http"
 	"github.com/JMURv/golang-clean-template/internal/observability/metrics/prometheus"
@@ -58,6 +59,7 @@ func main() {
 
 	conf := config.MustLoad("")
 	mustRegisterLogger(conf.Mode, conf.LogLvl)
+	validation.New()
 
 	prom := prometheus.New(conf.Server.PromPort)
 	go prom.Start()
