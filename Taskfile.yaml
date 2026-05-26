@@ -73,12 +73,12 @@ tasks:
   dc-prod:
     desc: Run prod compose
     cmds:
-      - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} up --profile app --watch"
+      - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} --profile app up --watch"
 
   dc-prod-build:
     desc: Build prod compose
     cmds:
-      - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} up --profile app --build --watch"
+      - "docker compose --env-file {{.PROD_ENV_PATH}} -f {{.PROD_DC_PATH}} --profile app up --build --watch"
 
   dc-prod-deps:
     desc: Run dev compose
@@ -103,12 +103,12 @@ tasks:
   dc-dev:
     desc: Run dev compose
     cmds:
-      - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} up --profile app --watch"
+      - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} --profile app up --watch"
 
   dc-dev-build:
     desc: Run dev compose
     cmds:
-      - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} up --profile app --build --watch"
+      - "docker compose --env-file {{.DEV_ENV_PATH}} -f {{.DEV_DC_PATH}} --profile app up --build --watch"
 
   dc-dev-deps:
     desc: Run dev compose

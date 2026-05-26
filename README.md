@@ -43,14 +43,17 @@ go install go.uber.org/mock/mockgen@latest
 ---
 
 ## Stack
-|          | Technology |
-|----------|------------|
-| Backend  | Golang     |
+|         | Technology |
+|---------|------------|
+| Backend | Golang     |
+| DB      | Postgres   |
+| Cache   | Redis      |
+| Queue   | Nats       |
 
 ---
 ## Configuration
 ### App
-Configuration files for dev placed in `/build/configs/envs`
+Configuration files placed in `/build/configs/envs`
 - Create your own `.env` based on `.env.example`:
 ```shell
 cp build/configs/envs/.env.example build/configs/envs/.env.dev && \
@@ -58,57 +61,34 @@ cp build/configs/envs/.env.example build/configs/envs/.env.prod
 ```
 
 ## Build
-### Locally
-In root folder run:
-```shell
-go build -o bin/main ./cmd/main.go
-```
-After that, you can run app via `./bin/main`
-___
-
-### Docker
 In the root folder run:
 ```shell
 task dc-dev-build
 ```
 
-or run:
+or:
 ```shell
 task dc-prod-build
 ```
 
-To build `dev` or `prod` containers respectively
+To build and run `dev` or `prod` containers respectively
 
 ## Run
-### Locally
-```shell
-go run cmd/main.go
-```
-
-___
-
-### Docker Compose
-Run dev (requires `build/configs/envs/.env.dev`):
+Dev:
 ```shell
 task dc-dev
 ```
 
-Run dev with observation containers:
+Dev with observation containers:
 ```shell
 task dc-dev-obs
 ```
 
-Run prod (requires `build/configs/envs/.env.prod`):
-```shell
-task dc-prod
-```
+Same with `prod` environment, just replace `dev` to `prod` in the commands.
 
-Run prod with observation containers:
-```shell
-task dc-prod-obs
-```
+--- 
 
-Observe profile starts svcs like: `prometheus`, `jaeger`, `node-exporter`, `grafana` and etc.
+Observe profile starts services like: `prometheus`, `jaeger`, `node-exporter`, `grafana` and etc.
 
 Services are available at:
 
@@ -123,7 +103,7 @@ Services are available at:
 | Loki             | http://localhost:3100  |
 | Grafana          | http://localhost:3000  |
 
-More information could be found inside `compose.yaml`.
+> More information could be found inside `compose.yaml`.
 
 ___
 
@@ -158,5 +138,5 @@ Run:
 task dc-k6
 ```
 
-It will spin up all `prod` environment, including observation containers and starts k6 scenario.
+It will spin up all the environment, including observation containers and starts `k6` scenario.
 Grafana has prebuilt dashboard for k6.

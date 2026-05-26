@@ -24,6 +24,11 @@ linters:
       allow:
         - HandlerT
 
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+
     wsl_v5:
       allow-first-in-block: true
       allow-whole-block: false
